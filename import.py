@@ -2,7 +2,7 @@ import requests
 import os
 
 # Base URL without the chapter number and file extension
-base_url = "https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/chapter"
+base_url = "https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/raw/chapter"
 
 # Directory to save the downloaded chapters
 save_dir = "downloaded_chapters"

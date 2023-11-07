@@ -1,266 +1,231 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <meta name="robots" content="noindex" />
-        <link rel="stylesheet" href="../style.css">
-        <title>chapter3.py · AFTS-CODE · GitFront</title>
-    </head>
-    <body>
-        <div class="container">
-            <div class="location">
-                <a href="..">AFTS-CODE</a> /
-                <span>chapter3.py</span>
-            </div>
+"""
+This is the provided example python code for Chapter three of the book:
+ "Advanced Futures Trading Strategies", by Robert Carver
+ https://www.systematicmoney.org/advanced-futures
 
-            <div class="blob-view">
-                <div class="header">
-                    <div>chapter3.py</div>
-                    <div class="last">
-                        <a class="btn" href="../raw/chapter3.py">Raw</a>
-                    </div>
-                </div>
-                <div class="content ">
-                    <pre style="background-color:#fff"><span style="color:#444"></span><span style="color:#b83838">&#34;&#34;&#34;</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This is the provided example python code for Chapter three of the book:</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838"> </span><span style="color:#b83838">&#34;</span><span style="color:#b83838">Advanced Futures Trading Strategies</span><span style="color:#b83838">&#34;</span><span style="color:#b83838">, by Robert Carver</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838"> https://www.systematicmoney.org/advanced-futures</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This code is copyright, Robert Carver 2022.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Shared under https://www.gnu.org/licenses/gpl-3.0.en.html</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">You may copy, modify, and share this code as long as this header is retained, and you disclose that it has been edited.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This code comes with no warranty, is not guaranteed to be accurate, and the author is not responsible for any losses that may result from it’s use.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Results may not match the book exactly as different data may be used</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Results may be different from the corresponding spreadsheet as methods may be slightly different</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">&#34;&#34;&#34;</span>
+This code is copyright, Robert Carver 2022.
+Shared under https://www.gnu.org/licenses/gpl-3.0.en.html
+You may copy, modify, and share this code as long as this header is retained, and you disclose that it has been edited.
+This code comes with no warranty, is not guaranteed to be accurate, and the author is not responsible for any losses that may result from it’s use.
 
-<span style="color:#888;font-style:italic">## Next two lines are optional depending on your IDE</span>
-<span style="color:#2838b0">import</span> <span style="color:#289870">matplotlib</span>
+Results may not match the book exactly as different data may be used
+Results may be different from the corresponding spreadsheet as methods may be slightly different
 
-matplotlib<span style="color:#666">.</span>use<span style="color:#888">(</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">TkAgg</span><span style="color:#b83838">&#34;</span><span style="color:#888">)</span>
+"""
 
-<span style="color:#2838b0">from</span> <span style="color:#289870">copy</span> <span style="color:#2838b0">import</span> copy
+## Next two lines are optional depending on your IDE
+import matplotlib
 
-<span style="color:#2838b0">import</span> <span style="color:#289870">pandas</span> <span style="color:#2838b0">as</span> <span style="color:#289870">pd</span>
+matplotlib.use("TkAgg")
 
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter1</span> <span style="color:#2838b0">import</span> <span style="color:#888">(</span>
-    pd_readcsv<span style="color:#888">,</span>
-    BUSINESS_DAYS_IN_YEAR<span style="color:#888">,</span>
-    calculate_perc_returns<span style="color:#888">,</span>
-    calculate_stats<span style="color:#888">,</span>
-    MONTH<span style="color:#888">,</span>
-<span style="color:#888">)</span>
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter2</span> <span style="color:#2838b0">import</span> calculate_minimum_capital
+from copy import copy
+
+import pandas as pd
+
+from chapter1 import (
+    pd_readcsv,
+    BUSINESS_DAYS_IN_YEAR,
+    calculate_perc_returns,
+    calculate_stats,
+    MONTH,
+)
+from chapter2 import calculate_minimum_capital
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_variable_standard_deviation_for_risk_targeting</span><span style="color:#888">(</span>
-    adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    current_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    use_perc_returns<span style="color:#888">:</span> <span style="color:#388038">bool</span> <span style="color:#666">=</span> <span style="font-style:italic">True</span><span style="color:#888">,</span>
-    annualise_stdev<span style="color:#888">:</span> <span style="color:#388038">bool</span> <span style="color:#666">=</span> <span style="font-style:italic">True</span><span style="color:#888">,</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
+def calculate_variable_standard_deviation_for_risk_targeting(
+    adjusted_price: pd.Series,
+    current_price: pd.Series,
+    use_perc_returns: bool = True,
+    annualise_stdev: bool = True,
+) -> pd.Series:
 
-    <span style="color:#2838b0">if</span> use_perc_returns<span style="color:#888">:</span>
-        daily_returns <span style="color:#666">=</span> calculate_percentage_returns<span style="color:#888">(</span>
-            adjusted_price<span style="color:#666">=</span>adjusted_price<span style="color:#888">,</span> current_price<span style="color:#666">=</span>current_price
-        <span style="color:#888">)</span>
-    <span style="color:#2838b0">else</span><span style="color:#888">:</span>
-        daily_returns <span style="color:#666">=</span> calculate_daily_returns<span style="color:#888">(</span>adjusted_price<span style="color:#666">=</span>adjusted_price<span style="color:#888">)</span>
+    if use_perc_returns:
+        daily_returns = calculate_percentage_returns(
+            adjusted_price=adjusted_price, current_price=current_price
+        )
+    else:
+        daily_returns = calculate_daily_returns(adjusted_price=adjusted_price)
 
-    <span style="color:#888;font-style:italic">## Can do the whole series or recent history</span>
-    daily_exp_std_dev <span style="color:#666">=</span> daily_returns<span style="color:#666">.</span>ewm<span style="color:#888">(</span>span<span style="color:#666">=</span><span style="color:#444">32</span><span style="color:#888">)</span><span style="color:#666">.</span>std<span style="color:#888">(</span><span style="color:#888">)</span>
+    ## Can do the whole series or recent history
+    daily_exp_std_dev = daily_returns.ewm(span=32).std()
 
-    <span style="color:#2838b0">if</span> annualise_stdev<span style="color:#888">:</span>
-        annualisation_factor <span style="color:#666">=</span> BUSINESS_DAYS_IN_YEAR <span style="color:#666">*</span><span style="color:#666">*</span> <span style="color:#444">0.5</span>
-    <span style="color:#2838b0">else</span><span style="color:#888">:</span>
-        <span style="color:#888;font-style:italic">## leave at daily</span>
-        annualisation_factor <span style="color:#666">=</span> <span style="color:#444">1</span>
+    if annualise_stdev:
+        annualisation_factor = BUSINESS_DAYS_IN_YEAR ** 0.5
+    else:
+        ## leave at daily
+        annualisation_factor = 1
 
-    annualised_std_dev <span style="color:#666">=</span> daily_exp_std_dev <span style="color:#666">*</span> annualisation_factor
+    annualised_std_dev = daily_exp_std_dev * annualisation_factor
 
-    <span style="color:#888;font-style:italic">## Weight with ten year vol</span>
-    ten_year_vol <span style="color:#666">=</span> annualised_std_dev<span style="color:#666">.</span>rolling<span style="color:#888">(</span>
-        BUSINESS_DAYS_IN_YEAR <span style="color:#666">*</span> <span style="color:#444">10</span><span style="color:#888">,</span> min_periods<span style="color:#666">=</span><span style="color:#444">1</span>
-    <span style="color:#888">)</span><span style="color:#666">.</span>mean<span style="color:#888">(</span><span style="color:#888">)</span>
-    weighted_vol <span style="color:#666">=</span> <span style="color:#444">0.3</span> <span style="color:#666">*</span> ten_year_vol <span style="color:#666">+</span> <span style="color:#444">0.7</span> <span style="color:#666">*</span> annualised_std_dev
+    ## Weight with ten year vol
+    ten_year_vol = annualised_std_dev.rolling(
+        BUSINESS_DAYS_IN_YEAR * 10, min_periods=1
+    ).mean()
+    weighted_vol = 0.3 * ten_year_vol + 0.7 * annualised_std_dev
 
-    <span style="color:#2838b0">return</span> weighted_vol
-
-
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_percentage_returns</span><span style="color:#888">(</span>
-    adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span> current_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
-
-    daily_price_changes <span style="color:#666">=</span> calculate_daily_returns<span style="color:#888">(</span>adjusted_price<span style="color:#888">)</span>
-    percentage_changes <span style="color:#666">=</span> daily_price_changes <span style="color:#666">/</span> current_price<span style="color:#666">.</span>shift<span style="color:#888">(</span><span style="color:#444">1</span><span style="color:#888">)</span>
-
-    <span style="color:#2838b0">return</span> percentage_changes
+    return weighted_vol
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_daily_returns</span><span style="color:#888">(</span>adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
+def calculate_percentage_returns(
+    adjusted_price: pd.Series, current_price: pd.Series
+) -> pd.Series:
 
-    <span style="color:#2838b0">return</span> adjusted_price<span style="color:#666">.</span>diff<span style="color:#888">(</span><span style="color:#888">)</span>
+    daily_price_changes = calculate_daily_returns(adjusted_price)
+    percentage_changes = daily_price_changes / current_price.shift(1)
 
-
-<span style="color:#2838b0">class</span> <span style="color:#287088">standardDeviation</span><span style="color:#888">(</span>pd<span style="color:#666">.</span>Series<span style="color:#888">)</span><span style="color:#888">:</span>
-    <span style="color:#888;font-style:italic">## class that can be eithier % or price based standard deviation estimate</span>
-    <span style="color:#2838b0">def</span> <span style="color:#b85820">__init__</span><span style="color:#888">(</span>
-        <span style="font-style:italic">self</span><span style="color:#888">,</span>
-        adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-        current_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-        use_perc_returns<span style="color:#888">:</span> <span style="color:#388038">bool</span> <span style="color:#666">=</span> <span style="font-style:italic">True</span><span style="color:#888">,</span>
-        annualise_stdev<span style="color:#888">:</span> <span style="color:#388038">bool</span> <span style="color:#666">=</span> <span style="font-style:italic">True</span><span style="color:#888">,</span>
-    <span style="color:#888">)</span><span style="color:#888">:</span>
-
-        stdev <span style="color:#666">=</span> calculate_variable_standard_deviation_for_risk_targeting<span style="color:#888">(</span>
-            adjusted_price<span style="color:#666">=</span>adjusted_price<span style="color:#888">,</span>
-            current_price<span style="color:#666">=</span>current_price<span style="color:#888">,</span>
-            annualise_stdev<span style="color:#666">=</span>annualise_stdev<span style="color:#888">,</span>
-            use_perc_returns<span style="color:#666">=</span>use_perc_returns<span style="color:#888">,</span>
-        <span style="color:#888">)</span>
-        <span style="color:#388038">super</span><span style="color:#888">(</span><span style="color:#888">)</span><span style="color:#666">.</span><span style="color:#b85820">__init__</span><span style="color:#888">(</span>stdev<span style="color:#888">)</span>
-
-        <span style="font-style:italic">self</span><span style="color:#666">.</span>_use_perc_returns <span style="color:#666">=</span> use_perc_returns
-        <span style="font-style:italic">self</span><span style="color:#666">.</span>_annualised <span style="color:#666">=</span> annualise_stdev
-        <span style="font-style:italic">self</span><span style="color:#666">.</span>_current_price <span style="color:#666">=</span> current_price
-
-    <span style="color:#2838b0">def</span> <span style="color:#785840">daily_risk_price_terms</span><span style="color:#888">(</span><span style="font-style:italic">self</span><span style="color:#888">)</span><span style="color:#888">:</span>
-        stdev <span style="color:#666">=</span> copy<span style="color:#888">(</span><span style="font-style:italic">self</span><span style="color:#888">)</span>
-        <span style="color:#2838b0">if</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>annualised<span style="color:#888">:</span>
-            stdev <span style="color:#666">=</span> stdev <span style="color:#666">/</span> <span style="color:#888">(</span>BUSINESS_DAYS_IN_YEAR <span style="color:#666">*</span><span style="color:#666">*</span> <span style="color:#444">0.5</span><span style="color:#888">)</span>
-
-        <span style="color:#2838b0">if</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>use_perc_returns<span style="color:#888">:</span>
-            stdev <span style="color:#666">=</span> stdev <span style="color:#666">*</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>current_price
-
-        <span style="color:#2838b0">return</span> stdev
-
-    <span style="color:#2838b0">def</span> <span style="color:#785840">annual_risk_price_terms</span><span style="color:#888">(</span><span style="font-style:italic">self</span><span style="color:#888">)</span><span style="color:#888">:</span>
-        stdev <span style="color:#666">=</span> copy<span style="color:#888">(</span><span style="font-style:italic">self</span><span style="color:#888">)</span>
-        <span style="color:#2838b0">if</span> <span style="color:#a848a8">not</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>annualised<span style="color:#888">:</span>
-            <span style="color:#888;font-style:italic"># daily</span>
-            stdev <span style="color:#666">=</span> stdev <span style="color:#666">*</span> <span style="color:#888">(</span>BUSINESS_DAYS_IN_YEAR <span style="color:#666">*</span><span style="color:#666">*</span> <span style="color:#444">0.5</span><span style="color:#888">)</span>
-
-        <span style="color:#2838b0">if</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>use_perc_returns<span style="color:#888">:</span>
-            stdev <span style="color:#666">=</span> stdev <span style="color:#666">*</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>current_price
-
-        <span style="color:#2838b0">return</span> stdev
-
-    <span style="color:#287088">@property</span>
-    <span style="color:#2838b0">def</span> <span style="color:#785840">annualised</span><span style="color:#888">(</span><span style="font-style:italic">self</span><span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> <span style="color:#388038">bool</span><span style="color:#888">:</span>
-        <span style="color:#2838b0">return</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>_annualised
-
-    <span style="color:#287088">@property</span>
-    <span style="color:#2838b0">def</span> <span style="color:#785840">use_perc_returns</span><span style="color:#888">(</span><span style="font-style:italic">self</span><span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> <span style="color:#388038">bool</span><span style="color:#888">:</span>
-        <span style="color:#2838b0">return</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>_use_perc_returns
-
-    <span style="color:#287088">@property</span>
-    <span style="color:#2838b0">def</span> <span style="color:#785840">current_price</span><span style="color:#888">(</span><span style="font-style:italic">self</span><span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
-        <span style="color:#2838b0">return</span> <span style="font-style:italic">self</span><span style="color:#666">.</span>_current_price
+    return percentage_changes
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_position_series_given_variable_risk</span><span style="color:#888">(</span>
-    capital<span style="color:#888">:</span> <span style="color:#388038">float</span><span style="color:#888">,</span>
-    risk_target_tau<span style="color:#888">:</span> <span style="color:#388038">float</span><span style="color:#888">,</span>
-    fx<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    multiplier<span style="color:#888">:</span> <span style="color:#388038">float</span><span style="color:#888">,</span>
-    instrument_risk<span style="color:#888">:</span> standardDeviation<span style="color:#888">,</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
+def calculate_daily_returns(adjusted_price: pd.Series) -> pd.Series:
 
-    <span style="color:#888;font-style:italic"># N = (Capital × τ) ÷ (Multiplier × Price × FX × σ %)</span>
-    <span style="color:#888;font-style:italic">## resolves to N = (Capital × τ) ÷ (Multiplier × FX × daily stdev price terms × 16)</span>
-    <span style="color:#888;font-style:italic">## for simplicity we use the daily risk in price terms, even if we calculated annualised % returns</span>
-    daily_risk_price_terms <span style="color:#666">=</span> instrument_risk<span style="color:#666">.</span>daily_risk_price_terms<span style="color:#888">(</span><span style="color:#888">)</span>
+    return adjusted_price.diff()
 
-    <span style="color:#2838b0">return</span> <span style="color:#888">(</span>
+
+class standardDeviation(pd.Series):
+    ## class that can be eithier % or price based standard deviation estimate
+    def __init__(
+        self,
+        adjusted_price: pd.Series,
+        current_price: pd.Series,
+        use_perc_returns: bool = True,
+        annualise_stdev: bool = True,
+    ):
+
+        stdev = calculate_variable_standard_deviation_for_risk_targeting(
+            adjusted_price=adjusted_price,
+            current_price=current_price,
+            annualise_stdev=annualise_stdev,
+            use_perc_returns=use_perc_returns,
+        )
+        super().__init__(stdev)
+
+        self._use_perc_returns = use_perc_returns
+        self._annualised = annualise_stdev
+        self._current_price = current_price
+
+    def daily_risk_price_terms(self):
+        stdev = copy(self)
+        if self.annualised:
+            stdev = stdev / (BUSINESS_DAYS_IN_YEAR ** 0.5)
+
+        if self.use_perc_returns:
+            stdev = stdev * self.current_price
+
+        return stdev
+
+    def annual_risk_price_terms(self):
+        stdev = copy(self)
+        if not self.annualised:
+            # daily
+            stdev = stdev * (BUSINESS_DAYS_IN_YEAR ** 0.5)
+
+        if self.use_perc_returns:
+            stdev = stdev * self.current_price
+
+        return stdev
+
+    @property
+    def annualised(self) -> bool:
+        return self._annualised
+
+    @property
+    def use_perc_returns(self) -> bool:
+        return self._use_perc_returns
+
+    @property
+    def current_price(self) -> pd.Series:
+        return self._current_price
+
+
+def calculate_position_series_given_variable_risk(
+    capital: float,
+    risk_target_tau: float,
+    fx: pd.Series,
+    multiplier: float,
+    instrument_risk: standardDeviation,
+) -> pd.Series:
+
+    # N = (Capital × τ) ÷ (Multiplier × Price × FX × σ %)
+    ## resolves to N = (Capital × τ) ÷ (Multiplier × FX × daily stdev price terms × 16)
+    ## for simplicity we use the daily risk in price terms, even if we calculated annualised % returns
+    daily_risk_price_terms = instrument_risk.daily_risk_price_terms()
+
+    return (
         capital
-        <span style="color:#666">*</span> risk_target_tau
-        <span style="color:#666">/</span> <span style="color:#888">(</span>multiplier <span style="color:#666">*</span> fx <span style="color:#666">*</span> daily_risk_price_terms <span style="color:#666">*</span> <span style="color:#888">(</span>BUSINESS_DAYS_IN_YEAR <span style="color:#666">*</span><span style="color:#666">*</span> <span style="color:#444">0.5</span><span style="color:#888">)</span><span style="color:#888">)</span>
-    <span style="color:#888">)</span>
+        * risk_target_tau
+        / (multiplier * fx * daily_risk_price_terms * (BUSINESS_DAYS_IN_YEAR ** 0.5))
+    )
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_turnover</span><span style="color:#888">(</span>position<span style="color:#888">,</span> average_position<span style="color:#888">)</span><span style="color:#888">:</span>
-    daily_trades <span style="color:#666">=</span> position<span style="color:#666">.</span>diff<span style="color:#888">(</span><span style="color:#888">)</span>
-    as_proportion_of_average <span style="color:#666">=</span> daily_trades<span style="color:#666">.</span>abs<span style="color:#888">(</span><span style="color:#888">)</span> <span style="color:#666">/</span> average_position<span style="color:#666">.</span>shift<span style="color:#888">(</span><span style="color:#444">1</span><span style="color:#888">)</span>
-    average_daily <span style="color:#666">=</span> as_proportion_of_average<span style="color:#666">.</span>mean<span style="color:#888">(</span><span style="color:#888">)</span>
-    annualised_turnover <span style="color:#666">=</span> average_daily <span style="color:#666">*</span> BUSINESS_DAYS_IN_YEAR
+def calculate_turnover(position, average_position):
+    daily_trades = position.diff()
+    as_proportion_of_average = daily_trades.abs() / average_position.shift(1)
+    average_daily = as_proportion_of_average.mean()
+    annualised_turnover = average_daily * BUSINESS_DAYS_IN_YEAR
 
-    <span style="color:#2838b0">return</span> annualised_turnover
+    return annualised_turnover
 
 
-<span style="color:#2838b0">if</span> <span style="color:#b85820">__name__</span> <span style="color:#666">==</span> <span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">__main__</span><span style="color:#b83838">&#34;</span><span style="color:#888">:</span>
-    <span style="color:#888;font-style:italic">## Get the file from https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/sp500.csv</span>
-    data <span style="color:#666">=</span> pd_readcsv<span style="color:#888">(</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">sp500.csv</span><span style="color:#b83838">&#34;</span><span style="color:#888">)</span>
-    data <span style="color:#666">=</span> data<span style="color:#666">.</span>dropna<span style="color:#888">(</span><span style="color:#888">)</span>
+if __name__ == "__main__":
+    ## Get the file from https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/sp500.csv
+    data = pd_readcsv("sp500.csv")
+    data = data.dropna()
 
-    adjusted_price <span style="color:#666">=</span> data<span style="color:#666">.</span>adjusted
-    current_price <span style="color:#666">=</span> data<span style="color:#666">.</span>underlying
-    multiplier <span style="color:#666">=</span> <span style="color:#444">5</span>
-    risk_target_tau <span style="color:#666">=</span> <span style="color:#444">0.2</span>
-    fx_series <span style="color:#666">=</span> pd<span style="color:#666">.</span>Series<span style="color:#888">(</span><span style="color:#444">1</span><span style="color:#888">,</span> index<span style="color:#666">=</span>data<span style="color:#666">.</span>index<span style="color:#888">)</span>  <span style="color:#888;font-style:italic">## FX rate, 1 for USD / USD</span>
+    adjusted_price = data.adjusted
+    current_price = data.underlying
+    multiplier = 5
+    risk_target_tau = 0.2
+    fx_series = pd.Series(1, index=data.index)  ## FX rate, 1 for USD / USD
 
-    capital <span style="color:#666">=</span> <span style="color:#444">100000</span>  <span style="color:#888;font-style:italic">## applies only to strategy 1</span>
+    capital = 100000  ## applies only to strategy 1
 
-    <span style="color:#888;font-style:italic">## eithier use annual # % returns, or daily price differences to calculate</span>
-    instrument_risk <span style="color:#666">=</span> standardDeviation<span style="color:#888">(</span>
-        adjusted_price<span style="color:#666">=</span>adjusted_price<span style="color:#888">,</span>
-        current_price<span style="color:#666">=</span>current_price<span style="color:#888">,</span>
-        use_perc_returns<span style="color:#666">=</span><span style="font-style:italic">True</span><span style="color:#888">,</span>
-        annualise_stdev<span style="color:#666">=</span><span style="font-style:italic">True</span><span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+    ## eithier use annual # % returns, or daily price differences to calculate
+    instrument_risk = standardDeviation(
+        adjusted_price=adjusted_price,
+        current_price=current_price,
+        use_perc_returns=True,
+        annualise_stdev=True,
+    )
 
-    <span style="color:#888;font-style:italic">## or</span>
-    <span style="color:#444"></span><span style="color:#b83838">&#34;&#34;&#34;</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">    instrument_risk = standardDeviation(adjusted_price=adjusted_price,</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">                                                current_price=current_price,</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">                                                 use_perc_returns=False,</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">                                                 annualise_stdev=False)</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">    </span><span style="color:#b83838">&#34;&#34;&#34;</span>
+    ## or
+    """
+    instrument_risk = standardDeviation(adjusted_price=adjusted_price,
+                                                current_price=current_price,
+                                                 use_perc_returns=False,
+                                                 annualise_stdev=False)
+    """
 
-    position_contracts_held <span style="color:#666">=</span> calculate_position_series_given_variable_risk<span style="color:#888">(</span>
-        capital<span style="color:#666">=</span>capital<span style="color:#888">,</span>
-        fx<span style="color:#666">=</span>fx_series<span style="color:#888">,</span>
-        instrument_risk<span style="color:#666">=</span>instrument_risk<span style="color:#888">,</span>
-        risk_target_tau<span style="color:#666">=</span>risk_target_tau<span style="color:#888">,</span>
-        multiplier<span style="color:#666">=</span>multiplier<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+    position_contracts_held = calculate_position_series_given_variable_risk(
+        capital=capital,
+        fx=fx_series,
+        instrument_risk=instrument_risk,
+        risk_target_tau=risk_target_tau,
+        multiplier=multiplier,
+    )
 
-    perc_return <span style="color:#666">=</span> calculate_perc_returns<span style="color:#888">(</span>
-        position_contracts_held<span style="color:#666">=</span>position_contracts_held<span style="color:#888">,</span>
-        adjusted_price<span style="color:#666">=</span>adjusted_price<span style="color:#888">,</span>
-        fx_series<span style="color:#666">=</span>fx_series<span style="color:#888">,</span>
-        capital_required<span style="color:#666">=</span>capital<span style="color:#888">,</span>
-        multiplier<span style="color:#666">=</span>multiplier<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+    perc_return = calculate_perc_returns(
+        position_contracts_held=position_contracts_held,
+        adjusted_price=adjusted_price,
+        fx_series=fx_series,
+        capital_required=capital,
+        multiplier=multiplier,
+    )
 
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span>calculate_stats<span style="color:#888">(</span>perc_return<span style="color:#888">)</span><span style="color:#888">)</span>
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span>calculate_stats<span style="color:#888">(</span>perc_return<span style="color:#888">)</span><span style="color:#888">,</span> MONTH<span style="color:#888">)</span>
+    print(calculate_stats(perc_return))
+    print(calculate_stats(perc_return), MONTH)
 
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span>
-        calculate_minimum_capital<span style="color:#888">(</span>
-            multiplier<span style="color:#666">=</span>multiplier<span style="color:#888">,</span>
-            risk_target<span style="color:#666">=</span>risk_target_tau<span style="color:#888">,</span>
-            fx<span style="color:#666">=</span><span style="color:#444">1</span><span style="color:#888">,</span>
-            instrument_risk_ann_perc<span style="color:#666">=</span>instrument_risk_ann_perc<span style="color:#888">[</span><span style="color:#666">-</span><span style="color:#444">1</span><span style="color:#888">]</span><span style="color:#888">,</span>
-            price<span style="color:#666">=</span>current_price<span style="color:#888">[</span><span style="color:#666">-</span><span style="color:#444">1</span><span style="color:#888">]</span><span style="color:#888">,</span>
-        <span style="color:#888">)</span>
-    <span style="color:#888">)</span>
+    print(
+        calculate_minimum_capital(
+            multiplier=multiplier,
+            risk_target=risk_target_tau,
+            fx=1,
+            instrument_risk_ann_perc=instrument_risk_ann_perc[-1],
+            price=current_price[-1],
+        )
+    )
 
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span>
-        calculate_turnover<span style="color:#888">(</span>
-            position_contracts_held<span style="color:#888">,</span> average_position<span style="color:#666">=</span>position_contracts_held
-        <span style="color:#888">)</span>
-    <span style="color:#888">)</span>
-</pre>
-                </div>
-            </div>
-
-            <div class="space"></div>
-            <div class="footer">
-                Powered by <a href="https://gitfront.io">GitFront</a>
-            </div>
-        </div>
-    </body>
-</html>
+    print(
+        calculate_turnover(
+            position_contracts_held, average_position=position_contracts_held
+        )
+    )

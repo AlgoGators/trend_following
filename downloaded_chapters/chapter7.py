@@ -1,230 +1,195 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <meta name="robots" content="noindex" />
-        <link rel="stylesheet" href="../style.css">
-        <title>chapter7.py · AFTS-CODE · GitFront</title>
-    </head>
-    <body>
-        <div class="container">
-            <div class="location">
-                <a href="..">AFTS-CODE</a> /
-                <span>chapter7.py</span>
-            </div>
+"""
+This is the provided example python code for Chapter seven of the book:
+ "Advanced Futures Trading Strategies", by Robert Carver
+ https://www.systematicmoney.org/advanced-futures
 
-            <div class="blob-view">
-                <div class="header">
-                    <div>chapter7.py</div>
-                    <div class="last">
-                        <a class="btn" href="../raw/chapter7.py">Raw</a>
-                    </div>
-                </div>
-                <div class="content ">
-                    <pre style="background-color:#fff"><span style="color:#444"></span><span style="color:#b83838">&#34;&#34;&#34;</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This is the provided example python code for Chapter seven of the book:</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838"> </span><span style="color:#b83838">&#34;</span><span style="color:#b83838">Advanced Futures Trading Strategies</span><span style="color:#b83838">&#34;</span><span style="color:#b83838">, by Robert Carver</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838"> https://www.systematicmoney.org/advanced-futures</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This code is copyright, Robert Carver 2022.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Shared under https://www.gnu.org/licenses/gpl-3.0.en.html</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">You may copy, modify, and share this code as long as this header is retained, and you disclose that it has been edited.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This code comes with no warranty, is not guaranteed to be accurate, and the author is not responsible for any losses that may result from it’s use.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Results may not match the book exactly as different data may be used</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Results may be different from the corresponding spreadsheet as methods may be slightly different</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">&#34;&#34;&#34;</span>
+This code is copyright, Robert Carver 2022.
+Shared under https://www.gnu.org/licenses/gpl-3.0.en.html
+You may copy, modify, and share this code as long as this header is retained, and you disclose that it has been edited.
+This code comes with no warranty, is not guaranteed to be accurate, and the author is not responsible for any losses that may result from it’s use.
 
-<span style="color:#888;font-style:italic">## Next two lines are optional depending on your IDE</span>
-<span style="color:#2838b0">import</span> <span style="color:#289870">matplotlib</span>
+Results may not match the book exactly as different data may be used
+Results may be different from the corresponding spreadsheet as methods may be slightly different
 
-matplotlib<span style="color:#666">.</span>use<span style="color:#888">(</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">TkAgg</span><span style="color:#b83838">&#34;</span><span style="color:#888">)</span>
+"""
 
-<span style="color:#2838b0">from</span> <span style="color:#289870">scipy.stats</span> <span style="color:#2838b0">import</span> linregress
-<span style="color:#2838b0">import</span> <span style="color:#289870">pandas</span> <span style="color:#2838b0">as</span> <span style="color:#289870">pd</span>
+## Next two lines are optional depending on your IDE
+import matplotlib
 
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter1</span> <span style="color:#2838b0">import</span> calculate_stats<span style="color:#888">,</span> MONTH<span style="color:#888">,</span> BUSINESS_DAYS_IN_YEAR
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter3</span> <span style="color:#2838b0">import</span> standardDeviation
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter4</span> <span style="color:#2838b0">import</span> <span style="color:#888">(</span>
-    get_data_dict<span style="color:#888">,</span>
-    calculate_variable_standard_deviation_for_risk_targeting_from_dict<span style="color:#888">,</span>
-    calculate_position_series_given_variable_risk_for_dict<span style="color:#888">,</span>
-    create_fx_series_given_adjusted_prices_dict<span style="color:#888">,</span>
-    aggregate_returns<span style="color:#888">,</span>
-<span style="color:#888">)</span>
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter5</span> <span style="color:#2838b0">import</span> ewmac<span style="color:#888">,</span> calculate_perc_returns_for_dict_with_costs
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter6</span> <span style="color:#2838b0">import</span> long_only_returns
+matplotlib.use("TkAgg")
+
+from scipy.stats import linregress
+import pandas as pd
+
+from chapter1 import calculate_stats, MONTH, BUSINESS_DAYS_IN_YEAR
+from chapter3 import standardDeviation
+from chapter4 import (
+    get_data_dict,
+    calculate_variable_standard_deviation_for_risk_targeting_from_dict,
+    calculate_position_series_given_variable_risk_for_dict,
+    create_fx_series_given_adjusted_prices_dict,
+    aggregate_returns,
+)
+from chapter5 import ewmac, calculate_perc_returns_for_dict_with_costs
+from chapter6 import long_only_returns
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_position_dict_with_trend_forecast_applied</span><span style="color:#888">(</span>
-    adjusted_prices_dict<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    average_position_contracts_dict<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    std_dev_dict<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    fast_span<span style="color:#888">:</span> <span style="color:#388038">int</span> <span style="color:#666">=</span> <span style="color:#444">64</span><span style="color:#888">,</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> <span style="color:#388038">dict</span><span style="color:#888">:</span>
+def calculate_position_dict_with_trend_forecast_applied(
+    adjusted_prices_dict: dict,
+    average_position_contracts_dict: dict,
+    std_dev_dict: dict,
+    fast_span: int = 64,
+) -> dict:
 
-    list_of_instruments <span style="color:#666">=</span> <span style="color:#388038">list</span><span style="color:#888">(</span>adjusted_prices_dict<span style="color:#666">.</span>keys<span style="color:#888">(</span><span style="color:#888">)</span><span style="color:#888">)</span>
-    position_dict_with_trend_filter <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>
-        <span style="color:#888">[</span>
-            <span style="color:#888">(</span>
-                instrument_code<span style="color:#888">,</span>
-                calculate_position_with_trend_forecast_applied<span style="color:#888">(</span>
-                    adjusted_prices_dict<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    average_position_contracts_dict<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    stdev_ann_perc<span style="color:#666">=</span>std_dev_dict<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    fast_span<span style="color:#666">=</span>fast_span<span style="color:#888">,</span>
-                <span style="color:#888">)</span><span style="color:#888">,</span>
-            <span style="color:#888">)</span>
-            <span style="color:#2838b0">for</span> instrument_code <span style="color:#a848a8">in</span> list_of_instruments
-        <span style="color:#888">]</span>
-    <span style="color:#888">)</span>
+    list_of_instruments = list(adjusted_prices_dict.keys())
+    position_dict_with_trend_filter = dict(
+        [
+            (
+                instrument_code,
+                calculate_position_with_trend_forecast_applied(
+                    adjusted_prices_dict[instrument_code],
+                    average_position_contracts_dict[instrument_code],
+                    stdev_ann_perc=std_dev_dict[instrument_code],
+                    fast_span=fast_span,
+                ),
+            )
+            for instrument_code in list_of_instruments
+        ]
+    )
 
-    <span style="color:#2838b0">return</span> position_dict_with_trend_filter
-
-
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_position_with_trend_forecast_applied</span><span style="color:#888">(</span>
-    adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    average_position<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    stdev_ann_perc<span style="color:#888">:</span> standardDeviation<span style="color:#888">,</span>
-    fast_span<span style="color:#888">:</span> <span style="color:#388038">int</span> <span style="color:#666">=</span> <span style="color:#444">64</span><span style="color:#888">,</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
-
-    forecast <span style="color:#666">=</span> calculate_forecast_for_ewmac<span style="color:#888">(</span>
-        adjusted_price<span style="color:#666">=</span>adjusted_price<span style="color:#888">,</span>
-        stdev_ann_perc<span style="color:#666">=</span>stdev_ann_perc<span style="color:#888">,</span>
-        fast_span<span style="color:#666">=</span>fast_span<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
-
-    <span style="color:#2838b0">return</span> forecast <span style="color:#666">*</span> average_position <span style="color:#666">/</span> <span style="color:#444">10</span>
+    return position_dict_with_trend_filter
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_forecast_for_ewmac</span><span style="color:#888">(</span>
-    adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span> stdev_ann_perc<span style="color:#888">:</span> standardDeviation<span style="color:#888">,</span> fast_span<span style="color:#888">:</span> <span style="color:#388038">int</span> <span style="color:#666">=</span> <span style="color:#444">64</span>
-<span style="color:#888">)</span><span style="color:#888">:</span>
+def calculate_position_with_trend_forecast_applied(
+    adjusted_price: pd.Series,
+    average_position: pd.Series,
+    stdev_ann_perc: standardDeviation,
+    fast_span: int = 64,
+) -> pd.Series:
 
-    scaled_ewmac <span style="color:#666">=</span> calculate_scaled_forecast_for_ewmac<span style="color:#888">(</span>
-        adjusted_price<span style="color:#666">=</span>adjusted_price<span style="color:#888">,</span>
-        stdev_ann_perc<span style="color:#666">=</span>stdev_ann_perc<span style="color:#888">,</span>
-        fast_span<span style="color:#666">=</span>fast_span<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
-    capped_ewmac <span style="color:#666">=</span> scaled_ewmac<span style="color:#666">.</span>clip<span style="color:#888">(</span><span style="color:#666">-</span><span style="color:#444">20</span><span style="color:#888">,</span> <span style="color:#444">20</span><span style="color:#888">)</span>
+    forecast = calculate_forecast_for_ewmac(
+        adjusted_price=adjusted_price,
+        stdev_ann_perc=stdev_ann_perc,
+        fast_span=fast_span,
+    )
 
-    <span style="color:#2838b0">return</span> capped_ewmac
-
-
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_scaled_forecast_for_ewmac</span><span style="color:#888">(</span>
-    adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    stdev_ann_perc<span style="color:#888">:</span> standardDeviation<span style="color:#888">,</span>
-    fast_span<span style="color:#888">:</span> <span style="color:#388038">int</span> <span style="color:#666">=</span> <span style="color:#444">64</span><span style="color:#888">,</span>
-<span style="color:#888">)</span><span style="color:#888">:</span>
-
-    scalar_dict <span style="color:#666">=</span> <span style="color:#888">{</span><span style="color:#444">64</span><span style="color:#888">:</span> <span style="color:#444">1.91</span><span style="color:#888">,</span> <span style="color:#444">32</span><span style="color:#888">:</span> <span style="color:#444">2.79</span><span style="color:#888">,</span> <span style="color:#444">16</span><span style="color:#888">:</span> <span style="color:#444">4.1</span><span style="color:#888">,</span> <span style="color:#444">8</span><span style="color:#888">:</span> <span style="color:#444">5.95</span><span style="color:#888">,</span> <span style="color:#444">4</span><span style="color:#888">:</span> <span style="color:#444">8.53</span><span style="color:#888">,</span> <span style="color:#444">2</span><span style="color:#888">:</span> <span style="color:#444">12.1</span><span style="color:#888">}</span>
-    risk_adjusted_ewmac <span style="color:#666">=</span> calculate_risk_adjusted_forecast_for_ewmac<span style="color:#888">(</span>
-        adjusted_price<span style="color:#666">=</span>adjusted_price<span style="color:#888">,</span>
-        stdev_ann_perc<span style="color:#666">=</span>stdev_ann_perc<span style="color:#888">,</span>
-        fast_span<span style="color:#666">=</span>fast_span<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
-    forecast_scalar <span style="color:#666">=</span> scalar_dict<span style="color:#888">[</span>fast_span<span style="color:#888">]</span>
-    scaled_ewmac <span style="color:#666">=</span> risk_adjusted_ewmac <span style="color:#666">*</span> forecast_scalar
-
-    <span style="color:#2838b0">return</span> scaled_ewmac
+    return forecast * average_position / 10
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_risk_adjusted_forecast_for_ewmac</span><span style="color:#888">(</span>
-    adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    stdev_ann_perc<span style="color:#888">:</span> standardDeviation<span style="color:#888">,</span>
-    fast_span<span style="color:#888">:</span> <span style="color:#388038">int</span> <span style="color:#666">=</span> <span style="color:#444">64</span><span style="color:#888">,</span>
-<span style="color:#888">)</span><span style="color:#888">:</span>
+def calculate_forecast_for_ewmac(
+    adjusted_price: pd.Series, stdev_ann_perc: standardDeviation, fast_span: int = 64
+):
 
-    ewmac_values <span style="color:#666">=</span> ewmac<span style="color:#888">(</span>adjusted_price<span style="color:#888">,</span> fast_span<span style="color:#666">=</span>fast_span<span style="color:#888">,</span> slow_span<span style="color:#666">=</span>fast_span <span style="color:#666">*</span> <span style="color:#444">4</span><span style="color:#888">)</span>
-    daily_price_vol <span style="color:#666">=</span> stdev_ann_perc<span style="color:#666">.</span>daily_risk_price_terms<span style="color:#888">(</span><span style="color:#888">)</span>
+    scaled_ewmac = calculate_scaled_forecast_for_ewmac(
+        adjusted_price=adjusted_price,
+        stdev_ann_perc=stdev_ann_perc,
+        fast_span=fast_span,
+    )
+    capped_ewmac = scaled_ewmac.clip(-20, 20)
 
-    risk_adjusted_ewmac <span style="color:#666">=</span> ewmac_values <span style="color:#666">/</span> daily_price_vol
-
-    <span style="color:#2838b0">return</span> risk_adjusted_ewmac
+    return capped_ewmac
 
 
-<span style="color:#2838b0">if</span> <span style="color:#b85820">__name__</span> <span style="color:#666">==</span> <span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">__main__</span><span style="color:#b83838">&#34;</span><span style="color:#888">:</span>
-    <span style="color:#888;font-style:italic">## Get the files from:</span>
-    <span style="color:#888;font-style:italic"># https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/sp500.csv</span>
-    <span style="color:#888;font-style:italic"># and https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/US10.csv</span>
-    adjusted_prices_dict<span style="color:#888">,</span> current_prices_dict <span style="color:#666">=</span> get_data_dict<span style="color:#888">(</span><span style="color:#888">)</span>
+def calculate_scaled_forecast_for_ewmac(
+    adjusted_price: pd.Series,
+    stdev_ann_perc: standardDeviation,
+    fast_span: int = 64,
+):
 
-    multipliers <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>sp500<span style="color:#666">=</span><span style="color:#444">5</span><span style="color:#888">,</span> us10<span style="color:#666">=</span><span style="color:#444">1000</span><span style="color:#888">)</span>
-    risk_target_tau <span style="color:#666">=</span> <span style="color:#444">0.2</span>
-    fx_series_dict <span style="color:#666">=</span> create_fx_series_given_adjusted_prices_dict<span style="color:#888">(</span>adjusted_prices_dict<span style="color:#888">)</span>
+    scalar_dict = {64: 1.91, 32: 2.79, 16: 4.1, 8: 5.95, 4: 8.53, 2: 12.1}
+    risk_adjusted_ewmac = calculate_risk_adjusted_forecast_for_ewmac(
+        adjusted_price=adjusted_price,
+        stdev_ann_perc=stdev_ann_perc,
+        fast_span=fast_span,
+    )
+    forecast_scalar = scalar_dict[fast_span]
+    scaled_ewmac = risk_adjusted_ewmac * forecast_scalar
 
-    capital <span style="color:#666">=</span> <span style="color:#444">1000000</span>
-    idm <span style="color:#666">=</span> <span style="color:#444">1.5</span>
-    instrument_weights <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>sp500<span style="color:#666">=</span><span style="color:#444">0.5</span><span style="color:#888">,</span> us10<span style="color:#666">=</span><span style="color:#444">0.5</span><span style="color:#888">)</span>
-    cost_per_contract_dict <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>sp500<span style="color:#666">=</span><span style="color:#444">0.875</span><span style="color:#888">,</span> us10<span style="color:#666">=</span><span style="color:#444">5</span><span style="color:#888">)</span>
+    return scaled_ewmac
 
-    std_dev_dict <span style="color:#666">=</span> calculate_variable_standard_deviation_for_risk_targeting_from_dict<span style="color:#888">(</span>
-        adjusted_prices<span style="color:#666">=</span>adjusted_prices_dict<span style="color:#888">,</span>
-        current_prices<span style="color:#666">=</span>current_prices_dict<span style="color:#888">,</span>
-        annualise_stdev<span style="color:#666">=</span><span style="font-style:italic">True</span><span style="color:#888">,</span>
-        use_perc_returns<span style="color:#666">=</span><span style="font-style:italic">True</span><span style="color:#888">,</span>
-    <span style="color:#888">)</span>
 
-    average_position_contracts_dict <span style="color:#666">=</span> <span style="color:#888">(</span>
-        calculate_position_series_given_variable_risk_for_dict<span style="color:#888">(</span>
-            capital<span style="color:#666">=</span>capital<span style="color:#888">,</span>
-            risk_target_tau<span style="color:#666">=</span>risk_target_tau<span style="color:#888">,</span>
-            idm<span style="color:#666">=</span>idm<span style="color:#888">,</span>
-            weights<span style="color:#666">=</span>instrument_weights<span style="color:#888">,</span>
-            std_dev_dict<span style="color:#666">=</span>std_dev_dict<span style="color:#888">,</span>
-            fx_series_dict<span style="color:#666">=</span>fx_series_dict<span style="color:#888">,</span>
-            multipliers<span style="color:#666">=</span>multipliers<span style="color:#888">,</span>
-        <span style="color:#888">)</span>
-    <span style="color:#888">)</span>
+def calculate_risk_adjusted_forecast_for_ewmac(
+    adjusted_price: pd.Series,
+    stdev_ann_perc: standardDeviation,
+    fast_span: int = 64,
+):
 
-    position_contracts_dict <span style="color:#666">=</span> calculate_position_dict_with_trend_forecast_applied<span style="color:#888">(</span>
-        adjusted_prices_dict<span style="color:#666">=</span>adjusted_prices_dict<span style="color:#888">,</span>
-        average_position_contracts_dict<span style="color:#666">=</span>average_position_contracts_dict<span style="color:#888">,</span>
-        std_dev_dict<span style="color:#666">=</span>std_dev_dict<span style="color:#888">,</span>
-        fast_span<span style="color:#666">=</span><span style="color:#444">64</span><span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+    ewmac_values = ewmac(adjusted_price, fast_span=fast_span, slow_span=fast_span * 4)
+    daily_price_vol = stdev_ann_perc.daily_risk_price_terms()
 
-    <span style="color:#888;font-style:italic">## note doesn&#39;t include roll costs</span>
-    perc_return_dict <span style="color:#666">=</span> calculate_perc_returns_for_dict_with_costs<span style="color:#888">(</span>
-        position_contracts_dict<span style="color:#666">=</span>position_contracts_dict<span style="color:#888">,</span>
-        fx_series<span style="color:#666">=</span>fx_series_dict<span style="color:#888">,</span>
-        multipliers<span style="color:#666">=</span>multipliers<span style="color:#888">,</span>
-        capital<span style="color:#666">=</span>capital<span style="color:#888">,</span>
-        adjusted_prices<span style="color:#666">=</span>adjusted_prices_dict<span style="color:#888">,</span>
-        cost_per_contract_dict<span style="color:#666">=</span>cost_per_contract_dict<span style="color:#888">,</span>
-        std_dev_dict<span style="color:#666">=</span>std_dev_dict<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+    risk_adjusted_ewmac = ewmac_values / daily_price_vol
 
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span>calculate_stats<span style="color:#888">(</span>perc_return_dict<span style="color:#888">[</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">sp500</span><span style="color:#b83838">&#34;</span><span style="color:#888">]</span><span style="color:#888">)</span><span style="color:#888">)</span>
+    return risk_adjusted_ewmac
 
-    perc_return_agg <span style="color:#666">=</span> aggregate_returns<span style="color:#888">(</span>perc_return_dict<span style="color:#888">)</span>
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span>calculate_stats<span style="color:#888">(</span>perc_return_agg<span style="color:#888">)</span><span style="color:#888">)</span>
 
-    long_only <span style="color:#666">=</span> long_only_returns<span style="color:#888">(</span>
-        adjusted_prices_dict<span style="color:#666">=</span>adjusted_prices_dict<span style="color:#888">,</span>
-        average_position_contracts_dict<span style="color:#666">=</span>average_position_contracts_dict<span style="color:#888">,</span>
-        capital<span style="color:#666">=</span>capital<span style="color:#888">,</span>
-        cost_per_contract_dict<span style="color:#666">=</span>cost_per_contract_dict<span style="color:#888">,</span>
-        fx_series_dict<span style="color:#666">=</span>fx_series_dict<span style="color:#888">,</span>
-        multipliers<span style="color:#666">=</span>multipliers<span style="color:#888">,</span>
-        std_dev_dict<span style="color:#666">=</span>std_dev_dict<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+if __name__ == "__main__":
+    ## Get the files from:
+    # https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/sp500.csv
+    # and https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/US10.csv
+    adjusted_prices_dict, current_prices_dict = get_data_dict()
 
-    results <span style="color:#666">=</span> linregress<span style="color:#888">(</span>long_only<span style="color:#888">,</span> perc_return_agg<span style="color:#888">)</span>
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">Beta </span><span style="color:#b83838;text-decoration:underline">%f</span><span style="color:#b83838">&#34;</span> <span style="color:#666">%</span> results<span style="color:#666">.</span>slope<span style="color:#888">)</span>
-    daily_alpha <span style="color:#666">=</span> results<span style="color:#666">.</span>intercept
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">Annual alpha </span><span style="color:#b83838;text-decoration:underline">%.2f</span><span style="color:#b83838;text-decoration:underline">%%</span><span style="color:#b83838">&#34;</span> <span style="color:#666">%</span> <span style="color:#888">(</span><span style="color:#444">100</span> <span style="color:#666">*</span> daily_alpha <span style="color:#666">*</span> BUSINESS_DAYS_IN_YEAR<span style="color:#888">)</span><span style="color:#888">)</span>
-</pre>
-                </div>
-            </div>
+    multipliers = dict(sp500=5, us10=1000)
+    risk_target_tau = 0.2
+    fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
 
-            <div class="space"></div>
-            <div class="footer">
-                Powered by <a href="https://gitfront.io">GitFront</a>
-            </div>
-        </div>
-    </body>
-</html>
+    capital = 1000000
+    idm = 1.5
+    instrument_weights = dict(sp500=0.5, us10=0.5)
+    cost_per_contract_dict = dict(sp500=0.875, us10=5)
+
+    std_dev_dict = calculate_variable_standard_deviation_for_risk_targeting_from_dict(
+        adjusted_prices=adjusted_prices_dict,
+        current_prices=current_prices_dict,
+        annualise_stdev=True,
+        use_perc_returns=True,
+    )
+
+    average_position_contracts_dict = (
+        calculate_position_series_given_variable_risk_for_dict(
+            capital=capital,
+            risk_target_tau=risk_target_tau,
+            idm=idm,
+            weights=instrument_weights,
+            std_dev_dict=std_dev_dict,
+            fx_series_dict=fx_series_dict,
+            multipliers=multipliers,
+        )
+    )
+
+    position_contracts_dict = calculate_position_dict_with_trend_forecast_applied(
+        adjusted_prices_dict=adjusted_prices_dict,
+        average_position_contracts_dict=average_position_contracts_dict,
+        std_dev_dict=std_dev_dict,
+        fast_span=64,
+    )
+
+    ## note doesn't include roll costs
+    perc_return_dict = calculate_perc_returns_for_dict_with_costs(
+        position_contracts_dict=position_contracts_dict,
+        fx_series=fx_series_dict,
+        multipliers=multipliers,
+        capital=capital,
+        adjusted_prices=adjusted_prices_dict,
+        cost_per_contract_dict=cost_per_contract_dict,
+        std_dev_dict=std_dev_dict,
+    )
+
+    print(calculate_stats(perc_return_dict["sp500"]))
+
+    perc_return_agg = aggregate_returns(perc_return_dict)
+    print(calculate_stats(perc_return_agg))
+
+    long_only = long_only_returns(
+        adjusted_prices_dict=adjusted_prices_dict,
+        average_position_contracts_dict=average_position_contracts_dict,
+        capital=capital,
+        cost_per_contract_dict=cost_per_contract_dict,
+        fx_series_dict=fx_series_dict,
+        multipliers=multipliers,
+        std_dev_dict=std_dev_dict,
+    )
+
+    results = linregress(long_only, perc_return_agg)
+    print("Beta %f" % results.slope)
+    daily_alpha = results.intercept
+    print("Annual alpha %.2f%%" % (100 * daily_alpha * BUSINESS_DAYS_IN_YEAR))

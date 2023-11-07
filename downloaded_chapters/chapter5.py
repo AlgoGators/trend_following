@@ -1,272 +1,237 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width" />
-        <meta name="robots" content="noindex" />
-        <link rel="stylesheet" href="../style.css">
-        <title>chapter5.py · AFTS-CODE · GitFront</title>
-    </head>
-    <body>
-        <div class="container">
-            <div class="location">
-                <a href="..">AFTS-CODE</a> /
-                <span>chapter5.py</span>
-            </div>
+"""
+This is the provided example python code for Chapter five of the book:
+ "Advanced Futures Trading Strategies", by Robert Carver
+ https://www.systematicmoney.org/advanced-futures
 
-            <div class="blob-view">
-                <div class="header">
-                    <div>chapter5.py</div>
-                    <div class="last">
-                        <a class="btn" href="../raw/chapter5.py">Raw</a>
-                    </div>
-                </div>
-                <div class="content ">
-                    <pre style="background-color:#fff"><span style="color:#444"></span><span style="color:#b83838">&#34;&#34;&#34;</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This is the provided example python code for Chapter five of the book:</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838"> </span><span style="color:#b83838">&#34;</span><span style="color:#b83838">Advanced Futures Trading Strategies</span><span style="color:#b83838">&#34;</span><span style="color:#b83838">, by Robert Carver</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838"> https://www.systematicmoney.org/advanced-futures</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This code is copyright, Robert Carver 2022.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Shared under https://www.gnu.org/licenses/gpl-3.0.en.html</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">You may copy, modify, and share this code as long as this header is retained, and you disclose that it has been edited.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">This code comes with no warranty, is not guaranteed to be accurate, and the author is not responsible for any losses that may result from it’s use.</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Results may not match the book exactly as different data may be used</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">Results may be different from the corresponding spreadsheet as methods may be slightly different</span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">
-</span><span style="color:#b83838"></span><span style="color:#b83838">&#34;&#34;&#34;</span>
+This code is copyright, Robert Carver 2022.
+Shared under https://www.gnu.org/licenses/gpl-3.0.en.html
+You may copy, modify, and share this code as long as this header is retained, and you disclose that it has been edited.
+This code comes with no warranty, is not guaranteed to be accurate, and the author is not responsible for any losses that may result from it’s use.
 
-<span style="color:#888;font-style:italic">## Next two lines are optional depending on your IDE</span>
-<span style="color:#2838b0">import</span> <span style="color:#289870">matplotlib</span>
+Results may not match the book exactly as different data may be used
+Results may be different from the corresponding spreadsheet as methods may be slightly different
 
-matplotlib<span style="color:#666">.</span>use<span style="color:#888">(</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">TkAgg</span><span style="color:#b83838">&#34;</span><span style="color:#888">)</span>
+"""
 
-<span style="color:#2838b0">from</span> <span style="color:#289870">copy</span> <span style="color:#2838b0">import</span> copy
-<span style="color:#2838b0">import</span> <span style="color:#289870">pandas</span> <span style="color:#2838b0">as</span> <span style="color:#289870">pd</span>
+## Next two lines are optional depending on your IDE
+import matplotlib
 
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter1</span> <span style="color:#2838b0">import</span> calculate_stats<span style="color:#888">,</span> BUSINESS_DAYS_IN_YEAR
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter3</span> <span style="color:#2838b0">import</span> standardDeviation
-<span style="color:#2838b0">from</span> <span style="color:#289870">chapter4</span> <span style="color:#2838b0">import</span> <span style="color:#888">(</span>
-    get_data_dict<span style="color:#888">,</span>
-    calculate_variable_standard_deviation_for_risk_targeting_from_dict<span style="color:#888">,</span>
-    calculate_position_series_given_variable_risk_for_dict<span style="color:#888">,</span>
-    create_fx_series_given_adjusted_prices_dict<span style="color:#888">,</span>
-    aggregate_returns<span style="color:#888">,</span>
-<span style="color:#888">)</span>
+matplotlib.use("TkAgg")
+
+from copy import copy
+import pandas as pd
+
+from chapter1 import calculate_stats, BUSINESS_DAYS_IN_YEAR
+from chapter3 import standardDeviation
+from chapter4 import (
+    get_data_dict,
+    calculate_variable_standard_deviation_for_risk_targeting_from_dict,
+    calculate_position_series_given_variable_risk_for_dict,
+    create_fx_series_given_adjusted_prices_dict,
+    aggregate_returns,
+)
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_position_dict_with_trend_filter_applied</span><span style="color:#888">(</span>
-    adjusted_prices_dict<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    average_position_contracts_dict<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> <span style="color:#388038">dict</span><span style="color:#888">:</span>
+def calculate_position_dict_with_trend_filter_applied(
+    adjusted_prices_dict: dict,
+    average_position_contracts_dict: dict,
+) -> dict:
 
-    list_of_instruments <span style="color:#666">=</span> <span style="color:#388038">list</span><span style="color:#888">(</span>adjusted_prices_dict<span style="color:#666">.</span>keys<span style="color:#888">(</span><span style="color:#888">)</span><span style="color:#888">)</span>
-    position_dict_with_trend_filter <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>
-        <span style="color:#888">[</span>
-            <span style="color:#888">(</span>
-                instrument_code<span style="color:#888">,</span>
-                calculate_position_with_trend_filter_applied<span style="color:#888">(</span>
-                    adjusted_prices_dict<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    average_position_contracts_dict<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                <span style="color:#888">)</span><span style="color:#888">,</span>
-            <span style="color:#888">)</span>
-            <span style="color:#2838b0">for</span> instrument_code <span style="color:#a848a8">in</span> list_of_instruments
-        <span style="color:#888">]</span>
-    <span style="color:#888">)</span>
+    list_of_instruments = list(adjusted_prices_dict.keys())
+    position_dict_with_trend_filter = dict(
+        [
+            (
+                instrument_code,
+                calculate_position_with_trend_filter_applied(
+                    adjusted_prices_dict[instrument_code],
+                    average_position_contracts_dict[instrument_code],
+                ),
+            )
+            for instrument_code in list_of_instruments
+        ]
+    )
 
-    <span style="color:#2838b0">return</span> position_dict_with_trend_filter
-
-
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_position_with_trend_filter_applied</span><span style="color:#888">(</span>
-    adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span> average_position<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
-
-    filtered_position <span style="color:#666">=</span> copy<span style="color:#888">(</span>average_position<span style="color:#888">)</span>
-    ewmac_values <span style="color:#666">=</span> ewmac<span style="color:#888">(</span>adjusted_price<span style="color:#888">)</span>
-    bearish <span style="color:#666">=</span> ewmac_values <span style="color:#666">&lt;</span> <span style="color:#444">0</span>
-    filtered_position<span style="color:#888">[</span>bearish<span style="color:#888">]</span> <span style="color:#666">=</span> <span style="color:#444">0</span>
-
-    <span style="color:#2838b0">return</span> filtered_position
+    return position_dict_with_trend_filter
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">ewmac</span><span style="color:#888">(</span>adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span> fast_span<span style="color:#666">=</span><span style="color:#444">16</span><span style="color:#888">,</span> slow_span<span style="color:#666">=</span><span style="color:#444">64</span><span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
+def calculate_position_with_trend_filter_applied(
+    adjusted_price: pd.Series, average_position: pd.Series
+) -> pd.Series:
 
-    slow_ewma <span style="color:#666">=</span> adjusted_price<span style="color:#666">.</span>ewm<span style="color:#888">(</span>span<span style="color:#666">=</span>slow_span<span style="color:#888">,</span> min_periods<span style="color:#666">=</span><span style="color:#444">2</span><span style="color:#888">)</span><span style="color:#666">.</span>mean<span style="color:#888">(</span><span style="color:#888">)</span>
-    fast_ewma <span style="color:#666">=</span> adjusted_price<span style="color:#666">.</span>ewm<span style="color:#888">(</span>span<span style="color:#666">=</span>fast_span<span style="color:#888">,</span> min_periods<span style="color:#666">=</span><span style="color:#444">2</span><span style="color:#888">)</span><span style="color:#666">.</span>mean<span style="color:#888">(</span><span style="color:#888">)</span>
+    filtered_position = copy(average_position)
+    ewmac_values = ewmac(adjusted_price)
+    bearish = ewmac_values < 0
+    filtered_position[bearish] = 0
 
-    <span style="color:#2838b0">return</span> fast_ewma <span style="color:#666">-</span> slow_ewma
-
-
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_perc_returns_for_dict_with_costs</span><span style="color:#888">(</span>
-    position_contracts_dict<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    adjusted_prices<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    multipliers<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    fx_series<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    capital<span style="color:#888">:</span> <span style="color:#388038">float</span><span style="color:#888">,</span>
-    cost_per_contract_dict<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-    std_dev_dict<span style="color:#888">:</span> <span style="color:#388038">dict</span><span style="color:#888">,</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> <span style="color:#388038">dict</span><span style="color:#888">:</span>
-
-    perc_returns_dict <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>
-        <span style="color:#888">[</span>
-            <span style="color:#888">(</span>
-                instrument_code<span style="color:#888">,</span>
-                calculate_perc_returns_with_costs<span style="color:#888">(</span>
-                    position_contracts_held<span style="color:#666">=</span>position_contracts_dict<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    adjusted_price<span style="color:#666">=</span>adjusted_prices<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    multiplier<span style="color:#666">=</span>multipliers<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    fx_series<span style="color:#666">=</span>fx_series<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    capital_required<span style="color:#666">=</span>capital<span style="color:#888">,</span>
-                    cost_per_contract<span style="color:#666">=</span>cost_per_contract_dict<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                    stdev_series<span style="color:#666">=</span>std_dev_dict<span style="color:#888">[</span>instrument_code<span style="color:#888">]</span><span style="color:#888">,</span>
-                <span style="color:#888">)</span><span style="color:#888">,</span>
-            <span style="color:#888">)</span>
-            <span style="color:#2838b0">for</span> instrument_code <span style="color:#a848a8">in</span> position_contracts_dict<span style="color:#666">.</span>keys<span style="color:#888">(</span><span style="color:#888">)</span>
-        <span style="color:#888">]</span>
-    <span style="color:#888">)</span>
-
-    <span style="color:#2838b0">return</span> perc_returns_dict
+    return filtered_position
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_perc_returns_with_costs</span><span style="color:#888">(</span>
-    position_contracts_held<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    adjusted_price<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    fx_series<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-    stdev_series<span style="color:#888">:</span> standardDeviation<span style="color:#888">,</span>
-    multiplier<span style="color:#888">:</span> <span style="color:#388038">float</span><span style="color:#888">,</span>
-    capital_required<span style="color:#888">:</span> <span style="color:#388038">float</span><span style="color:#888">,</span>
-    cost_per_contract<span style="color:#888">:</span> <span style="color:#388038">float</span><span style="color:#888">,</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
+def ewmac(adjusted_price: pd.Series, fast_span=16, slow_span=64) -> pd.Series:
 
-    precost_return_price_points <span style="color:#666">=</span> <span style="color:#888">(</span>
-        adjusted_price <span style="color:#666">-</span> adjusted_price<span style="color:#666">.</span>shift<span style="color:#888">(</span><span style="color:#444">1</span><span style="color:#888">)</span>
-    <span style="color:#888">)</span> <span style="color:#666">*</span> position_contracts_held<span style="color:#666">.</span>shift<span style="color:#888">(</span><span style="color:#444">1</span><span style="color:#888">)</span>
+    slow_ewma = adjusted_price.ewm(span=slow_span, min_periods=2).mean()
+    fast_ewma = adjusted_price.ewm(span=fast_span, min_periods=2).mean()
 
-    precost_return_instrument_currency <span style="color:#666">=</span> precost_return_price_points <span style="color:#666">*</span> multiplier
-    historic_costs <span style="color:#666">=</span> calculate_costs_deflated_for_vol<span style="color:#888">(</span>
-        stddev_series<span style="color:#666">=</span>stdev_series<span style="color:#888">,</span>
-        cost_per_contract<span style="color:#666">=</span>cost_per_contract<span style="color:#888">,</span>
-        position_contracts_held<span style="color:#666">=</span>position_contracts_held<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
-
-    historic_costs_aligned <span style="color:#666">=</span> historic_costs<span style="color:#666">.</span>reindex<span style="color:#888">(</span>
-        precost_return_instrument_currency<span style="color:#666">.</span>index<span style="color:#888">,</span> method<span style="color:#666">=</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">ffill</span><span style="color:#b83838">&#34;</span>
-    <span style="color:#888">)</span>
-    return_instrument_currency <span style="color:#666">=</span> <span style="color:#888">(</span>
-        precost_return_instrument_currency <span style="color:#666">-</span> historic_costs_aligned
-    <span style="color:#888">)</span>
-
-    fx_series_aligned <span style="color:#666">=</span> fx_series<span style="color:#666">.</span>reindex<span style="color:#888">(</span>
-        return_instrument_currency<span style="color:#666">.</span>index<span style="color:#888">,</span> method<span style="color:#666">=</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">ffill</span><span style="color:#b83838">&#34;</span>
-    <span style="color:#888">)</span>
-    return_base_currency <span style="color:#666">=</span> return_instrument_currency <span style="color:#666">*</span> fx_series_aligned
-
-    perc_return <span style="color:#666">=</span> return_base_currency <span style="color:#666">/</span> capital_required
-
-    <span style="color:#2838b0">return</span> perc_return
+    return fast_ewma - slow_ewma
 
 
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_costs_deflated_for_vol</span><span style="color:#888">(</span>
-    stddev_series<span style="color:#888">:</span> standardDeviation<span style="color:#888">,</span>
-    cost_per_contract<span style="color:#888">:</span> <span style="color:#388038">float</span><span style="color:#888">,</span>
-    position_contracts_held<span style="color:#888">:</span> pd<span style="color:#666">.</span>Series<span style="color:#888">,</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
+def calculate_perc_returns_for_dict_with_costs(
+    position_contracts_dict: dict,
+    adjusted_prices: dict,
+    multipliers: dict,
+    fx_series: dict,
+    capital: float,
+    cost_per_contract_dict: dict,
+    std_dev_dict: dict,
+) -> dict:
 
-    round_position_contracts_held <span style="color:#666">=</span> position_contracts_held<span style="color:#666">.</span>round<span style="color:#888">(</span><span style="color:#888">)</span>
-    position_change <span style="color:#666">=</span> <span style="color:#888">(</span>
-        round_position_contracts_held <span style="color:#666">-</span> round_position_contracts_held<span style="color:#666">.</span>shift<span style="color:#888">(</span><span style="color:#444">1</span><span style="color:#888">)</span>
-    <span style="color:#888">)</span>
-    abs_trades <span style="color:#666">=</span> position_change<span style="color:#666">.</span>abs<span style="color:#888">(</span><span style="color:#888">)</span>
+    perc_returns_dict = dict(
+        [
+            (
+                instrument_code,
+                calculate_perc_returns_with_costs(
+                    position_contracts_held=position_contracts_dict[instrument_code],
+                    adjusted_price=adjusted_prices[instrument_code],
+                    multiplier=multipliers[instrument_code],
+                    fx_series=fx_series[instrument_code],
+                    capital_required=capital,
+                    cost_per_contract=cost_per_contract_dict[instrument_code],
+                    stdev_series=std_dev_dict[instrument_code],
+                ),
+            )
+            for instrument_code in position_contracts_dict.keys()
+        ]
+    )
 
-    historic_cost_per_contract <span style="color:#666">=</span> calculate_deflated_costs<span style="color:#888">(</span>
-        stddev_series<span style="color:#666">=</span>stddev_series<span style="color:#888">,</span> cost_per_contract<span style="color:#666">=</span>cost_per_contract
-    <span style="color:#888">)</span>
-
-    historic_cost_per_contract_aligned <span style="color:#666">=</span> historic_cost_per_contract<span style="color:#666">.</span>reindex<span style="color:#888">(</span>
-        abs_trades<span style="color:#666">.</span>index<span style="color:#888">,</span> method<span style="color:#666">=</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">ffill</span><span style="color:#b83838">&#34;</span>
-    <span style="color:#888">)</span>
-
-    historic_costs <span style="color:#666">=</span> abs_trades <span style="color:#666">*</span> historic_cost_per_contract_aligned
-
-    <span style="color:#2838b0">return</span> historic_costs
-
-
-<span style="color:#2838b0">def</span> <span style="color:#785840">calculate_deflated_costs</span><span style="color:#888">(</span>
-    stddev_series<span style="color:#888">:</span> standardDeviation<span style="color:#888">,</span> cost_per_contract<span style="color:#888">:</span> <span style="color:#388038">float</span>
-<span style="color:#888">)</span> <span style="color:#666">-</span><span style="color:#666">&gt;</span> pd<span style="color:#666">.</span>Series<span style="color:#888">:</span>
-
-    stdev_daily_price <span style="color:#666">=</span> stddev_series<span style="color:#666">.</span>daily_risk_price_terms<span style="color:#888">(</span><span style="color:#888">)</span>
-
-    final_stdev <span style="color:#666">=</span> stdev_daily_price<span style="color:#888">[</span><span style="color:#666">-</span><span style="color:#444">1</span><span style="color:#888">]</span>
-    cost_deflator <span style="color:#666">=</span> stdev_daily_price <span style="color:#666">/</span> final_stdev
-    historic_cost_per_contract <span style="color:#666">=</span> cost_per_contract <span style="color:#666">*</span> cost_deflator
-
-    <span style="color:#2838b0">return</span> historic_cost_per_contract
+    return perc_returns_dict
 
 
-<span style="color:#2838b0">if</span> <span style="color:#b85820">__name__</span> <span style="color:#666">==</span> <span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">__main__</span><span style="color:#b83838">&#34;</span><span style="color:#888">:</span>
-    <span style="color:#888;font-style:italic">## Get the files from:</span>
-    <span style="color:#888;font-style:italic"># https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/sp500.csv</span>
-    <span style="color:#888;font-style:italic"># and https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/US10.csv</span>
-    adjusted_prices_dict<span style="color:#888">,</span> current_prices_dict <span style="color:#666">=</span> get_data_dict<span style="color:#888">(</span><span style="color:#888">)</span>
+def calculate_perc_returns_with_costs(
+    position_contracts_held: pd.Series,
+    adjusted_price: pd.Series,
+    fx_series: pd.Series,
+    stdev_series: standardDeviation,
+    multiplier: float,
+    capital_required: float,
+    cost_per_contract: float,
+) -> pd.Series:
 
-    multipliers <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>sp500<span style="color:#666">=</span><span style="color:#444">5</span><span style="color:#888">,</span> us10<span style="color:#666">=</span><span style="color:#444">1000</span><span style="color:#888">)</span>
-    risk_target_tau <span style="color:#666">=</span> <span style="color:#444">0.2</span>
-    fx_series_dict <span style="color:#666">=</span> create_fx_series_given_adjusted_prices_dict<span style="color:#888">(</span>adjusted_prices_dict<span style="color:#888">)</span>
+    precost_return_price_points = (
+        adjusted_price - adjusted_price.shift(1)
+    ) * position_contracts_held.shift(1)
 
-    capital <span style="color:#666">=</span> <span style="color:#444">1000000</span>
-    idm <span style="color:#666">=</span> <span style="color:#444">1.5</span>
-    instrument_weights <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>sp500<span style="color:#666">=</span><span style="color:#444">0.5</span><span style="color:#888">,</span> us10<span style="color:#666">=</span><span style="color:#444">0.5</span><span style="color:#888">)</span>
-    cost_per_contract_dict <span style="color:#666">=</span> <span style="color:#388038">dict</span><span style="color:#888">(</span>sp500<span style="color:#666">=</span><span style="color:#444">0.875</span><span style="color:#888">,</span> us10<span style="color:#666">=</span><span style="color:#444">5</span><span style="color:#888">)</span>
+    precost_return_instrument_currency = precost_return_price_points * multiplier
+    historic_costs = calculate_costs_deflated_for_vol(
+        stddev_series=stdev_series,
+        cost_per_contract=cost_per_contract,
+        position_contracts_held=position_contracts_held,
+    )
 
-    std_dev_dict <span style="color:#666">=</span> calculate_variable_standard_deviation_for_risk_targeting_from_dict<span style="color:#888">(</span>
-        adjusted_prices<span style="color:#666">=</span>adjusted_prices_dict<span style="color:#888">,</span>
-        current_prices<span style="color:#666">=</span>current_prices_dict<span style="color:#888">,</span>
-        use_perc_returns<span style="color:#666">=</span><span style="font-style:italic">True</span><span style="color:#888">,</span>
-        annualise_stdev<span style="color:#666">=</span><span style="font-style:italic">True</span><span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+    historic_costs_aligned = historic_costs.reindex(
+        precost_return_instrument_currency.index, method="ffill"
+    )
+    return_instrument_currency = (
+        precost_return_instrument_currency - historic_costs_aligned
+    )
 
-    average_position_contracts_dict <span style="color:#666">=</span> <span style="color:#888">(</span>
-        calculate_position_series_given_variable_risk_for_dict<span style="color:#888">(</span>
-            capital<span style="color:#666">=</span>capital<span style="color:#888">,</span>
-            risk_target_tau<span style="color:#666">=</span>risk_target_tau<span style="color:#888">,</span>
-            idm<span style="color:#666">=</span>idm<span style="color:#888">,</span>
-            weights<span style="color:#666">=</span>instrument_weights<span style="color:#888">,</span>
-            std_dev_dict<span style="color:#666">=</span>std_dev_dict<span style="color:#888">,</span>
-            fx_series_dict<span style="color:#666">=</span>fx_series_dict<span style="color:#888">,</span>
-            multipliers<span style="color:#666">=</span>multipliers<span style="color:#888">,</span>
-        <span style="color:#888">)</span>
-    <span style="color:#888">)</span>
+    fx_series_aligned = fx_series.reindex(
+        return_instrument_currency.index, method="ffill"
+    )
+    return_base_currency = return_instrument_currency * fx_series_aligned
 
-    position_contracts_dict <span style="color:#666">=</span> calculate_position_dict_with_trend_filter_applied<span style="color:#888">(</span>
-        adjusted_prices_dict<span style="color:#666">=</span>adjusted_prices_dict<span style="color:#888">,</span>
-        average_position_contracts_dict<span style="color:#666">=</span>average_position_contracts_dict<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+    perc_return = return_base_currency / capital_required
 
-    <span style="color:#888;font-style:italic">## note doesn&#39;t include roll costs</span>
-    perc_return_dict <span style="color:#666">=</span> calculate_perc_returns_for_dict_with_costs<span style="color:#888">(</span>
-        position_contracts_dict<span style="color:#666">=</span>position_contracts_dict<span style="color:#888">,</span>
-        fx_series<span style="color:#666">=</span>fx_series_dict<span style="color:#888">,</span>
-        multipliers<span style="color:#666">=</span>multipliers<span style="color:#888">,</span>
-        capital<span style="color:#666">=</span>capital<span style="color:#888">,</span>
-        adjusted_prices<span style="color:#666">=</span>adjusted_prices_dict<span style="color:#888">,</span>
-        cost_per_contract_dict<span style="color:#666">=</span>cost_per_contract_dict<span style="color:#888">,</span>
-        std_dev_dict<span style="color:#666">=</span>std_dev_dict<span style="color:#888">,</span>
-    <span style="color:#888">)</span>
+    return perc_return
 
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span>calculate_stats<span style="color:#888">(</span>perc_return_dict<span style="color:#888">[</span><span style="color:#444"></span><span style="color:#b83838">&#34;</span><span style="color:#b83838">sp500</span><span style="color:#b83838">&#34;</span><span style="color:#888">]</span><span style="color:#888">)</span><span style="color:#888">)</span>
 
-    perc_return_agg <span style="color:#666">=</span> aggregate_returns<span style="color:#888">(</span>perc_return_dict<span style="color:#888">)</span>
-    <span style="color:#2838b0">print</span><span style="color:#888">(</span>calculate_stats<span style="color:#888">(</span>perc_return_agg<span style="color:#888">)</span><span style="color:#888">)</span>
-</pre>
-                </div>
-            </div>
+def calculate_costs_deflated_for_vol(
+    stddev_series: standardDeviation,
+    cost_per_contract: float,
+    position_contracts_held: pd.Series,
+) -> pd.Series:
 
-            <div class="space"></div>
-            <div class="footer">
-                Powered by <a href="https://gitfront.io">GitFront</a>
-            </div>
-        </div>
-    </body>
-</html>
+    round_position_contracts_held = position_contracts_held.round()
+    position_change = (
+        round_position_contracts_held - round_position_contracts_held.shift(1)
+    )
+    abs_trades = position_change.abs()
+
+    historic_cost_per_contract = calculate_deflated_costs(
+        stddev_series=stddev_series, cost_per_contract=cost_per_contract
+    )
+
+    historic_cost_per_contract_aligned = historic_cost_per_contract.reindex(
+        abs_trades.index, method="ffill"
+    )
+
+    historic_costs = abs_trades * historic_cost_per_contract_aligned
+
+    return historic_costs
+
+
+def calculate_deflated_costs(
+    stddev_series: standardDeviation, cost_per_contract: float
+) -> pd.Series:
+
+    stdev_daily_price = stddev_series.daily_risk_price_terms()
+
+    final_stdev = stdev_daily_price[-1]
+    cost_deflator = stdev_daily_price / final_stdev
+    historic_cost_per_contract = cost_per_contract * cost_deflator
+
+    return historic_cost_per_contract
+
+
+if __name__ == "__main__":
+    ## Get the files from:
+    # https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/sp500.csv
+    # and https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/blob/US10.csv
+    adjusted_prices_dict, current_prices_dict = get_data_dict()
+
+    multipliers = dict(sp500=5, us10=1000)
+    risk_target_tau = 0.2
+    fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
+
+    capital = 1000000
+    idm = 1.5
+    instrument_weights = dict(sp500=0.5, us10=0.5)
+    cost_per_contract_dict = dict(sp500=0.875, us10=5)
+
+    std_dev_dict = calculate_variable_standard_deviation_for_risk_targeting_from_dict(
+        adjusted_prices=adjusted_prices_dict,
+        current_prices=current_prices_dict,
+        use_perc_returns=True,
+        annualise_stdev=True,
+    )
+
+    average_position_contracts_dict = (
+        calculate_position_series_given_variable_risk_for_dict(
+            capital=capital,
+            risk_target_tau=risk_target_tau,
+            idm=idm,
+            weights=instrument_weights,
+            std_dev_dict=std_dev_dict,
+            fx_series_dict=fx_series_dict,
+            multipliers=multipliers,
+        )
+    )
+
+    position_contracts_dict = calculate_position_dict_with_trend_filter_applied(
+        adjusted_prices_dict=adjusted_prices_dict,
+        average_position_contracts_dict=average_position_contracts_dict,
+    )
+
+    ## note doesn't include roll costs
+    perc_return_dict = calculate_perc_returns_for_dict_with_costs(
+        position_contracts_dict=position_contracts_dict,
+        fx_series=fx_series_dict,
+        multipliers=multipliers,
+        capital=capital,
+        adjusted_prices=adjusted_prices_dict,
+        cost_per_contract_dict=cost_per_contract_dict,
+        std_dev_dict=std_dev_dict,
+    )
+
+    print(calculate_stats(perc_return_dict["sp500"]))
+
+    perc_return_agg = aggregate_returns(perc_return_dict)
+    print(calculate_stats(perc_return_agg))
