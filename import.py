@@ -5,7 +5,7 @@ import os
 base_url = "https://gitfront.io/r/user-4000052/iTvUZwEUN2Ta/AFTS-CODE/raw/chapter"
 
 # Directory to save the downloaded chapters
-save_dir = "downloaded_chapters"
+save_dir = "."
 
 # Make directory if it doesn't exist
 os.makedirs(save_dir, exist_ok=True)
@@ -23,7 +23,7 @@ for i in range(1, last_chapter + 1):
     
     # Check if the request was successful
     if response.status_code == 200:
-        # Write the content to a file in the specified save directory
+        # Write the content to a file in the current directory 
         filename = f"chapter{i}.py"
         filepath = os.path.join(save_dir, filename)
         
