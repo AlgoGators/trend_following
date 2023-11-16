@@ -10,8 +10,11 @@ save_dir = "downloaded_chapters"
 # Make directory if it doesn't exist
 os.makedirs(save_dir, exist_ok=True)
 
+# array of needed chapters
+# taking user input for the last chapter needed
+last_chapter = int(input("Enter the last chapter needed: "))
 # Loop through chapter numbers
-for i in range(1, 9):
+for i in range(1, last_chapter + 1):
     # Construct the full URL for each chapter
     url = f"{base_url}{i}.py"
     
