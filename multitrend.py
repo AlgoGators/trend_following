@@ -38,38 +38,37 @@ def get_data_dict(instr_list: list):
 
     all_data = dict(
         [
-            (instrument_code, pd_readcsv("%s.csv" % instrument_code))
+            (instrument_code, pd_readcsv("%s.csv" % instrument_code, date_format="%m/%d/%Y", date_index_name='Date'))
             for instrument_code in instr_list
         ]
     )
 
     adjusted_prices = dict(
         [
-            (instrument_code, data_for_instrument.adjusted)
+            (instrument_code, data_for_instrument.Close)
             for instrument_code, data_for_instrument in all_data.items()
         ]
     )
 
     current_prices = dict(
         [
-            (instrument_code, data_for_instrument.underlying)
+            (instrument_code, data_for_instrument.Unadj_Close)
             for instrument_code, data_for_instrument in all_data.items()
         ]
     )
 
     return adjusted_prices, current_prices
 
-def trend_forecast(risk_target_tau: float, multipliers: dict, instr_list: list, fast_span: list) -> dict:
+def trend_forecast(capital: int, risk_target_tau: float, multipliers: dict, instr_list: list, fast_spans: list) -> tuple[dict, dict]:
 
     adjusted_prices_dict, current_prices_dict = get_data_dict(instr_list)
 
     fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
 
-    capital = 1000000
 
     idm = 1.5
-    instrument_weights = dict(sp500=0.5, us10=0.5)
-    cost_per_contract_dict = dict(sp500=0.875, us10=5)
+    instrument_weights = dict(ES=0.5, us10=0.5)
+    cost_per_contract_dict = dict(ES=0.875, us10=5)
 
     std_dev_dict = calculate_variable_standard_deviation_for_risk_targeting_from_dict(
         adjusted_prices=adjusted_prices_dict, current_prices=current_prices_dict
@@ -89,7 +88,6 @@ def trend_forecast(risk_target_tau: float, multipliers: dict, instr_list: list, 
 
     ## We use three arbitrary slow spans here for both instruments
     ## In reality we would need to check costs and turnover
-    fast_spans = [16, 32, 64]
     position_contracts_dict = (
         calculate_position_dict_with_multiple_trend_forecast_applied(
             adjusted_prices_dict=adjusted_prices_dict,
@@ -114,8 +112,18 @@ def trend_forecast(risk_target_tau: float, multipliers: dict, instr_list: list, 
         std_dev_dict=std_dev_dict,
     )
 
-    return buffered_position_dict
+    return perc_return_dict, buffered_position_dict
 
-
-multipliers = dict(sp500=5, us10=1000)
+INSTRUMENT_LIST = ['ES']
+multipliers = dict(ES=5)
 risk_target_tau = 0.2
+capital = 100_000
+
+
+perc, fc = trend_forecast(capital, risk_target_tau, multipliers, INSTRUMENT_LIST, [16, 32, 64])
+
+df = pd.DataFrame.from_dict(fc)
+
+print(calculate_stats(perc['ES']))
+
+df.to_csv("out.csv")

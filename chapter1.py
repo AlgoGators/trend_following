@@ -25,6 +25,8 @@ import numpy as np
 
 DEFAULT_DATE_FORMAT = "%Y-%m-%d"
 
+DUSTIN_DATE_FORMAT = "%m/%d/%Y"
+
 def pd_readcsv(
     filename: str,
         date_format=DEFAULT_DATE_FORMAT,
