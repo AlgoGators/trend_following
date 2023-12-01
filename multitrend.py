@@ -29,11 +29,10 @@ from chapter9 import (
 # grab fisrt string from arg
 if len(sys.argv) < 2:
     print("Usage: python3 multitrend.py <filename>")
-    sys.exit(1)
-
-filename = sys.argv[1]
-data = pd_readcsv(filename)
-data = data.dropna()
+else:
+    filename = sys.argv[1]
+    data = pd_readcsv(filename)
+    data = data.dropna()
 
 def get_data_dict(instr_list: list):
 
