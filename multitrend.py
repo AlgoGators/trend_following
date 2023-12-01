@@ -39,7 +39,7 @@ def get_data_dict(instr_list: list):
 
     all_data = dict(
         [
-            (instrument_code, pd_readcsv("%s.csv" % instrument_code, date_format="%m/%d/%Y", date_index_name='Date'))
+            (instrument_code, pd_readcsv(f"data/{instrument_code}.csv"  , date_format="%m/%d/%Y", date_index_name='Date'))
             for instrument_code in instr_list
         ]
     )
@@ -123,8 +123,8 @@ capital = 100_000
 
 perc, fc = trend_forecast(capital, risk_target_tau, multipliers, INSTRUMENT_LIST, [16, 32, 64])
 
-df = pd.DataFrame.from_dict(fc)
+forecast = pd.DataFrame.from_dict(fc)
 
 print(calculate_stats(perc['ES']))
 
-df.to_csv("out.csv")
+# Pass forecast data frame to forecaster function which adds forecast column to each instrument in instrument list
