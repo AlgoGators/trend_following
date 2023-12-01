@@ -24,6 +24,7 @@ from chapter9 import (
     calculate_position_with_multiple_trend_forecast_applied,
 
 )
+from getMultiplierDict import getMultiplierDict
 # NEED TO READ DATA FIRST
 
 # grab fisrt string from arg
@@ -66,7 +67,7 @@ def trend_forecast(capital: int, risk_target_tau: float, multipliers: dict, inst
     fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
 
 
-    idm = 1.5
+    idm = 1
     instrument_weights = dict(ES=0.5, us10=0.5)
     cost_per_contract_dict = dict(ES=0.875, us10=5)
 
@@ -115,7 +116,7 @@ def trend_forecast(capital: int, risk_target_tau: float, multipliers: dict, inst
     return perc_return_dict, buffered_position_dict
 
 INSTRUMENT_LIST = ['ES']
-multipliers = dict(ES=5)
+multipliers = getMultiplierDict()
 risk_target_tau = 0.2
 capital = 100_000
 
