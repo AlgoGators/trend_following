@@ -60,15 +60,51 @@ def get_data_dict(instr_list: list):
 
     return adjusted_prices, current_prices
 
-def trend_forecast(capital: int, risk_target_tau: float, multipliers: dict, instr_list: list, fast_spans: list) -> tuple[dict, dict]:
+def calc_idm(instrument_list: list) -> float:
+
+    # if the lenght of the instrument list lands in a certain bracket, return a certain value
+    # this is not a true idm, but a rough approx.
+    # TRUE IDM = 1 / sqrt(w.rho.wT)
+    n = len(instrument_list)
+
+    if n == 1:
+        return 1.0
+    elif n == 2:
+        return 1.20
+    elif n == 3:
+        return 1.48
+    elif n == 4:
+        return 1.56
+    elif n == 5:
+        return 1.70
+    elif n == 6:
+        return 1.90
+    elif n == 7:
+        return 2.10
+    elif n >= 8 and n <= 14:
+        return 2.20
+    elif n >= 15 and n <= 24:
+        return 2.30
+    elif n >= 25 and n <= 30:
+        return 2.40
+    elif n > 30:
+        return 2.50
+
+    # if we reached here, something went wrong
+    raise ValueError("Instrument Diversity Multiplier not found")
+          
+
+def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> tuple[dict, dict]:
 
     adjusted_prices_dict, current_prices_dict = get_data_dict(instr_list)
 
     fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
 
 
-    idm = 1
-    instrument_weights = dict(ES=0.5, us10=0.5)
+    idm = calc_idm(instr_list)
+
+    instrument_weights = weights
+
     cost_per_contract_dict = dict(ES=0.875, us10=5)
 
     std_dev_dict = calculate_variable_standard_deviation_for_risk_targeting_from_dict(
@@ -116,12 +152,14 @@ def trend_forecast(capital: int, risk_target_tau: float, multipliers: dict, inst
     return perc_return_dict, buffered_position_dict
 
 INSTRUMENT_LIST = ['ES']
+weights = dict(ES=1.0)
+
 multipliers = getMultiplierDict()
 risk_target_tau = 0.2
 capital = 100_000
 
 
-perc, fc = trend_forecast(capital, risk_target_tau, multipliers, INSTRUMENT_LIST, [16, 32, 64])
+perc, fc = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
 forecast = pd.DataFrame.from_dict(fc)
 
