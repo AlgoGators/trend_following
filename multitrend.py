@@ -63,6 +63,8 @@ def get_data_dict(instr_list: list):
 def calc_idm(instrument_list: list) -> float:
 
     # if the lenght of the instrument list lands in a certain bracket, return a certain value
+    # this is not a true idm, but a rough approx.
+    # TRUE IDM = 1 / sqrt(w.rho.wT)
     n = len(instrument_list)
 
     if n == 1:
