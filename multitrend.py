@@ -27,19 +27,17 @@ from chapter9 import (
 from getMultiplierDict import getMultiplierDict
 # NEED TO READ DATA FIRST
 
-# grab fisrt string from arg
+# grab fisrt string from arg to show capital
 if len(sys.argv) < 2:
-    print("Usage: python3 multitrend.py <filename>")
+    print("Usage: python3 multitrend.py capital")
 else:
-    filename = sys.argv[1]
-    data = pd_readcsv(filename)
-    data = data.dropna()
+    capital = sys.argv[1]
 
 def get_data_dict(instr_list: list):
 
     all_data = dict(
         [
-            (instrument_code, pd_readcsv(f"data/{instrument_code}.csv"  , date_format="%m/%d/%Y", date_index_name='Date'))
+            (instrument_code, pd_readcsv(f"data/_{instrument_code}_Data.csv"  , date_format="%m/%d/%Y", date_index_name='Date'))
             for instrument_code in instr_list
         ]
     )
@@ -105,7 +103,7 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
 
     instrument_weights = weights
 
-    cost_per_contract_dict = dict(ES=0.875, us10=5)
+    cost_per_contract_dict = dict(ES=0.875, CL=0.875)
 
     std_dev_dict = calculate_variable_standard_deviation_for_risk_targeting_from_dict(
         adjusted_prices=adjusted_prices_dict, current_prices=current_prices_dict
@@ -151,18 +149,25 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
 
     return perc_return_dict, buffered_position_dict
 
-INSTRUMENT_LIST = ['ES']
-weights = dict(ES=1.0)
+# List of all instruments in the portfolio
+INSTRUMENT_LIST = ['ES', 'CL']
 
+even_weights = 1 / len(INSTRUMENT_LIST)
+
+weights = dict(ES=even_weights, CL =even_weights)
+# dict of equal weight for each instrument in the list
+weights = {instrument: even_weights for instrument in INSTRUMENT_LIST}
 multipliers = getMultiplierDict()
 risk_target_tau = 0.2
-capital = 100_000
 
+capital: int = 100000
+if len(sys.argv) < 2:
+    print("Usage: python3 multitrend.py capital")
+else:
+    capital = int(sys.argv[1])
 
 perc, fc = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
 forecast = pd.DataFrame.from_dict(fc)
-
-print(calculate_stats(perc['ES']))
-
+print(forecast.tail(50))
 # Pass forecast data frame to forecaster function which adds forecast column to each instrument in instrument list

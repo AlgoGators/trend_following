@@ -3,3 +3,4 @@ __pycache__
 .~lock.multipliers.csv#
 multipliers.numbers
 out.csv
+data
