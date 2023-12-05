@@ -150,7 +150,7 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
     return perc_return_dict, buffered_position_dict
 
 # List of all instruments in the portfolio
-INSTRUMENT_LIST = ['ES', 'CL']
+INSTRUMENT_LIST = ['ES']
 
 even_weights = 1 / len(INSTRUMENT_LIST)
 
@@ -169,5 +169,5 @@ else:
 perc, fc = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
 forecast = pd.DataFrame.from_dict(fc)
-print(forecast.tail(50))
 # Pass forecast data frame to forecaster function which adds forecast column to each instrument in instrument list
+print(calculate_stats(perc['ES']))
