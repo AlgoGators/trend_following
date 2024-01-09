@@ -8,8 +8,24 @@ DUSTIN_DATE_FORMAT = "%m/%d/%Y"
 def pd_read_sql(
     ins_code: str,
     engine,
-        date_format=DEFAULT_DATE_FORMAT,
+        date_format=DUSTIN_DATE_FORMAT,
         date_index_name: str="Date",
+) -> pd.DataFrame:
+
+    ans = pd.read_sql(ins_code, engine)
+    ans.index = pd.to_datetime(ans[date_index_name], format=date_format).values
+
+    del ans[date_index_name]
+
+    ans.index.name = None
+
+    return ans
+
+def pd_read_sql_carry(
+    ins_code: str,
+    engine,
+        date_format=DEFAULT_DATE_FORMAT,
+        date_index_name: str="index",
 ) -> pd.DataFrame:
 
     ans = pd.read_sql(ins_code, engine)
