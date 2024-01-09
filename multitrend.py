@@ -137,7 +137,7 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
         std_dev_dict=std_dev_dict,
     )
 
-    return buffered_position_dict, position_contracts_dict
+    return [buffered_position_dict, position_contracts_dict]
 
 # List of all instruments in the portfolio
 INSTRUMENT_LIST = ['ES']

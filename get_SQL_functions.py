@@ -125,3 +125,13 @@ def get_data_dict_sql_carry(instr_list: list):
     )
 
     return adjusted_prices, current_prices, all_data_carry
+
+def get_multipliers():
+    # Read in the multiplier data
+    df = pd.read_csv("multipliers.csv", index_col=0)
+    # Convert the dataframe to a dictionary
+    m_series = df["multiplier"].astype(int)
+
+    multiplierDict = m_series.to_dict()
+    # Return the dictionary
+    return multiplierDict
