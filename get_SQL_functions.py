@@ -9,10 +9,10 @@ def pd_read_sql(
     ins_code: str,
     engine,
         date_format=DEFAULT_DATE_FORMAT,
-        date_index_name: str="index",
+        date_index_name: str="Date",
 ) -> pd.DataFrame:
 
-    ans = pd.read_sql(f"select * from {ins_code}", engine)
+    ans = pd.read_sql(ins_code, engine)
     ans.index = pd.to_datetime(ans[date_index_name], format=date_format).values
 
     del ans[date_index_name]
@@ -53,7 +53,7 @@ def get_data_dict_sql_no_carry(instr_list: list):
 
     all_data_carry = dict(
         [
-            (instrument_code, pd_read_sql(f"SELECT * FROM [{instrument_code}]", engine2))
+            (instrument_code, pd_read_sql(f"SELECT * FROM [{instrument_code}_Carry]", engine2))
             for instrument_code in instr_list
         ]
     )
@@ -105,7 +105,7 @@ def get_data_dict_sql_carry(instr_list: list):
 
     all_data_carry = dict(
         [
-            (instrument_code, pd_read_sql(f"SELECT * FROM [{instrument_code}]", engine2))
+            (instrument_code, pd_read_sql(f"SELECT * FROM [{instrument_code}_Carry]", engine2))
             for instrument_code in instr_list
         ]
     )
@@ -125,13 +125,3 @@ def get_data_dict_sql_carry(instr_list: list):
     )
 
     return adjusted_prices, current_prices, all_data_carry
-
-def get_multipliers():
-    # Read in the multiplier data
-    df = pd.read_csv("multipliers.csv", index_col=0)
-    # Convert the dataframe to a dictionary
-    m_series = df["multiplier"].astype(int)
-
-    multiplierDict = m_series.to_dict()
-    # Return the dictionary
-    return multiplierDict
