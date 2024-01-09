@@ -26,13 +26,7 @@ from chapter9 import (
 )
 from getMultiplierDict import getMultiplierDict
 # NEED TO READ DATA FIRST
-
-# grab fisrt string from arg to show capital
-if len(sys.argv) < 2:
-    print("Usage: python3 multitrend.py capital")
-else:
-    capital = sys.argv[1]
-
+import get_SQL_functions as sql
 def get_data_dict(instr_list: list):
 
     all_data = dict(
@@ -92,9 +86,9 @@ def calc_idm(instrument_list: list) -> float:
     raise ValueError("Instrument Diversity Multiplier not found")
           
 
-def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> tuple[dict, dict]:
+def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> list:
 
-    adjusted_prices_dict, current_prices_dict = get_data_dict(instr_list)
+    adjusted_prices_dict, current_prices_dict = sql.get_data_dict_sql_no_carry(instr_list)
 
     fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
 
@@ -147,7 +141,7 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
         std_dev_dict=std_dev_dict,
     )
 
-    return perc_return_dict, buffered_position_dict
+    return buffered_position_dict, position_contracts_dict
 
 # List of all instruments in the portfolio
 INSTRUMENT_LIST = ['ES']
