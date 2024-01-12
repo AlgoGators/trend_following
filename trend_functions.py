@@ -1,6 +1,9 @@
+import numpy as np
 import pandas as pd
+
 from risk_functions import standardDeviation
 
+# Position Sizing from Trend
 def calculate_position_dict_with_multiple_trend_forecast_applied(
     adjusted_prices_dict: dict,
     average_position_contracts_dict: dict,
@@ -120,3 +123,186 @@ def ewmac(adjusted_price: pd.Series, fast_span=16, slow_span=64) -> pd.Series:
     fast_ewma = adjusted_price.ewm(span=fast_span, min_periods=2).mean()
 
     return fast_ewma - slow_ewma
+
+# Buffering
+
+def apply_buffering_to_position_dict(
+    position_contracts_dict: dict, average_position_contracts_dict: dict
+) -> dict:
+
+    instrument_list = list(position_contracts_dict.keys())
+    buffered_position_dict = dict(
+        [
+            (
+                instrument_code,
+                apply_buffering_to_positions(
+                    position_contracts=position_contracts_dict[instrument_code],
+                    average_position_contracts=average_position_contracts_dict[
+                        instrument_code
+                    ],
+                ),
+            )
+            for instrument_code in instrument_list
+        ]
+    )
+
+    return buffered_position_dict
+
+def apply_buffering_to_positions(
+    position_contracts: pd.Series,
+    average_position_contracts: pd.Series,
+    buffer_size: float = 0.10,
+) -> pd.Series:
+
+    buffer = average_position_contracts.abs() * buffer_size
+    upper_buffer = position_contracts + buffer
+    lower_buffer = position_contracts - buffer
+
+    buffered_position = apply_buffer(
+        optimal_position=position_contracts,
+        upper_buffer=upper_buffer,
+        lower_buffer=lower_buffer,
+    )
+
+    return buffered_position
+
+def apply_buffer(
+    optimal_position: pd.Series, upper_buffer: pd.Series, lower_buffer: pd.Series
+) -> pd.Series:
+
+    upper_buffer = upper_buffer.ffill().round()
+    lower_buffer = lower_buffer.ffill().round()
+    use_optimal_position = optimal_position.ffill()
+
+    current_position = use_optimal_position[0]
+    if np.isnan(current_position):
+        current_position = 0.0
+
+    buffered_position_list = [current_position]
+
+    for idx in range(len(optimal_position.index))[1:]:
+        current_position = apply_buffer_single_period(
+            last_position=current_position,
+            top_pos=upper_buffer[idx],
+            bot_pos=lower_buffer[idx],
+        )
+
+        buffered_position_list.append(current_position)
+
+    buffered_position = pd.Series(buffered_position_list, index=optimal_position.index)
+
+    return buffered_position
+
+def apply_buffer_single_period(last_position: int, top_pos: float, bot_pos: float):
+
+    if last_position > top_pos:
+        return top_pos
+    elif last_position < bot_pos:
+        return bot_pos
+    else:
+        return last_position
+
+# Calculating Percentage Returns
+
+def calculate_perc_returns_for_dict_with_costs(
+    position_contracts_dict: dict,
+    adjusted_prices: dict,
+    multipliers: dict,
+    fx_series: dict,
+    capital: float,
+    cost_per_contract_dict: dict,
+    std_dev_dict: dict,
+) -> dict:
+
+    perc_returns_dict = dict(
+        [
+            (
+                instrument_code,
+                calculate_perc_returns_with_costs(
+                    position_contracts_held=position_contracts_dict[instrument_code],
+                    adjusted_price=adjusted_prices[instrument_code],
+                    multiplier=multipliers[instrument_code],
+                    fx_series=fx_series[instrument_code],
+                    capital_required=capital,
+                    cost_per_contract=cost_per_contract_dict[instrument_code],
+                    stdev_series=std_dev_dict[instrument_code],
+                ),
+            )
+            for instrument_code in position_contracts_dict.keys()
+        ]
+    )
+
+    return perc_returns_dict
+
+def calculate_perc_returns_with_costs(
+    position_contracts_held: pd.Series,
+    adjusted_price: pd.Series,
+    fx_series: pd.Series,
+    stdev_series: standardDeviation,
+    multiplier: float,
+    capital_required: float,
+    cost_per_contract: float,
+) -> pd.Series:
+
+    precost_return_price_points = (
+        adjusted_price - adjusted_price.shift(1)
+    ) * position_contracts_held.shift(1)
+
+    precost_return_instrument_currency = precost_return_price_points * multiplier
+    historic_costs = calculate_costs_deflated_for_vol(
+        stddev_series=stdev_series,
+        cost_per_contract=cost_per_contract,
+        position_contracts_held=position_contracts_held,
+    )
+
+    historic_costs_aligned = historic_costs.reindex(
+        precost_return_instrument_currency.index, method="ffill"
+    )
+    return_instrument_currency = (
+        precost_return_instrument_currency - historic_costs_aligned
+    )
+
+    fx_series_aligned = fx_series.reindex(
+        return_instrument_currency.index, method="ffill"
+    )
+    return_base_currency = return_instrument_currency * fx_series_aligned
+
+    perc_return = return_base_currency / capital_required
+
+    return perc_return
+
+def calculate_costs_deflated_for_vol(
+    stddev_series: standardDeviation,
+    cost_per_contract: float,
+    position_contracts_held: pd.Series,
+) -> pd.Series:
+
+    round_position_contracts_held = position_contracts_held.round()
+    position_change = (
+        round_position_contracts_held - round_position_contracts_held.shift(1)
+    )
+    abs_trades = position_change.abs()
+
+    historic_cost_per_contract = calculate_deflated_costs(
+        stddev_series=stddev_series, cost_per_contract=cost_per_contract
+    )
+
+    historic_cost_per_contract_aligned = historic_cost_per_contract.reindex(
+        abs_trades.index, method="ffill"
+    )
+
+    historic_costs = abs_trades * historic_cost_per_contract_aligned
+
+    return historic_costs
+
+def calculate_deflated_costs(
+    stddev_series: standardDeviation, cost_per_contract: float
+) -> pd.Series:
+
+    stdev_daily_price = stddev_series.daily_risk_price_terms()
+
+    final_stdev = stdev_daily_price[-1]
+    cost_deflator = stdev_daily_price / final_stdev
+    historic_cost_per_contract = cost_per_contract * cost_deflator
+
+    return historic_cost_per_contract
