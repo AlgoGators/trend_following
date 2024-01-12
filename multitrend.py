@@ -5,36 +5,37 @@ from fx_functions import create_fx_series_given_adjusted_prices_dict
 from risk_functions import calculate_variable_standard_deviation_for_risk_targeting_from_dict
 from risk_functions import calculate_position_series_given_variable_risk_for_dict
 
-from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs, calculate_stats
+from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
 
 import pandas as pd
 from getMultiplierDict import getMultiplierDict
 # NEED TO READ DATA FIRST
 import get_SQL_functions as sql
-def get_data_dict(instr_list: list):
 
-    all_data = dict(
-        [
-            (instrument_code, pd_readcsv(f"data/_{instrument_code}_Data.csv"  , date_format="%m/%d/%Y", date_index_name='Date'))
-            for instrument_code in instr_list
-        ]
-    )
-
-    adjusted_prices = dict(
-        [
-            (instrument_code, data_for_instrument.Close)
-            for instrument_code, data_for_instrument in all_data.items()
-        ]
-    )
-
-    current_prices = dict(
-        [
-            (instrument_code, data_for_instrument.Unadj_Close)
-            for instrument_code, data_for_instrument in all_data.items()
-        ]
-    )
-
-    return adjusted_prices, current_prices
+# def get_data_dict(instr_list: list):
+#
+#     all_data = dict(
+#         [
+#             (instrument_code, pd_readcsv(f"data/_{instrument_code}_Data.csv"  , date_format="%m/%d/%Y", date_index_name='Date'))
+#             for instrument_code in instr_list
+#         ]
+#     )
+#
+#     adjusted_prices = dict(
+#         [
+#             (instrument_code, data_for_instrument.Close)
+#             for instrument_code, data_for_instrument in all_data.items()
+#         ]
+#     )
+#
+#     current_prices = dict(
+#         [
+#             (instrument_code, data_for_instrument.Unadj_Close)
+#             for instrument_code, data_for_instrument in all_data.items()
+#         ]
+#     )
+#
+#     return adjusted_prices, current_prices
 
 def calc_idm(instrument_list: list) -> float:
 
@@ -143,5 +144,3 @@ capital: int = 100000
 perc, fc = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
 forecast = pd.DataFrame.from_dict(fc)
-# Pass forecast data frame to forecaster function which adds forecast column to each instrument in instrument list
-print(calculate_stats(perc['ES']))
