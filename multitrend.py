@@ -1,25 +1,13 @@
+from sql_functions import get_data_dict_sql_no_carry
+
+from fx_functions import create_fx_series_given_adjusted_prices_dict
+
+from risk_functions import calculate_variable_standard_deviation_for_risk_targeting_from_dict
+from risk_functions import calculate_position_series_given_variable_risk_for_dict
+
+from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs, calculate_stats
+
 import pandas as pd
-import sys
-
-from chapter1 import (
-    calculate_stats,
-    pd_readcsv,
-)
-from chapter3 import standardDeviation
-from chapter4 import (
-    create_fx_series_given_adjusted_prices_dict,
-    calculate_variable_standard_deviation_for_risk_targeting_from_dict,
-    calculate_position_series_given_variable_risk_for_dict,
-)
-
-from chapter5 import calculate_perc_returns_for_dict_with_costs
-from chapter7 import calculate_forecast_for_ewmac
-from chapter8 import apply_buffering_to_position_dict
-from chapter9 import (
-    calculate_position_dict_with_multiple_trend_forecast_applied,
-    calculate_position_with_multiple_trend_forecast_applied,
-
-)
 from getMultiplierDict import getMultiplierDict
 # NEED TO READ DATA FIRST
 import get_SQL_functions as sql
@@ -151,10 +139,6 @@ multipliers = getMultiplierDict()
 risk_target_tau = 0.2
 
 capital: int = 100000
-if len(sys.argv) < 2:
-    print("Usage: python3 multitrend.py capital")
-else:
-    capital = int(sys.argv[1])
 
 perc, fc = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
