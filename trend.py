@@ -10,7 +10,6 @@ from trend_functions import calculate_position_dict_with_multiple_trend_forecast
 import pandas as pd
 from getMultiplierDict import getMultiplierDict
 # NEED TO READ DATA FIRST
-import get_SQL_functions as sql
 
 # def get_data_dict(instr_list: list):
 #
