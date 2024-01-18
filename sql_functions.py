@@ -32,6 +32,9 @@ def get_data(instrument_list: list):
         if name not in instrument_list:
           table_names.remove(table_name)
 
+    # Remove sysdiagrams from table_names
+    table_names.remove('sysdiagrams')
+
     # Remove _Data from table names
     for i in range(len(table_names)):
         table_names[i] = table_names[i][:-5]
