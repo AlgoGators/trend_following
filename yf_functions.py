@@ -17,7 +17,10 @@ def get_instrument_data(ticker, start_date, end_date)-> pd.DataFrame:
     Pulls futures data from Yahoo Finance
     """
     ticker = yf.Ticker(ticker)
-    data = ticker.history(start=start_date, end=end_date)
+    try:
+        data = ticker.history(start=start_date, end=end_date, interval='1d')
+    except:
+        data = None
     df_data = pd.DataFrame(data)
     return df_data
 
@@ -36,5 +39,9 @@ if __name__ == "__main__":
     print(instrument_list)
     data_dict = get_instrument_data_dict(instrument_list, '2024-01-01', '2024-01-02')
     # print first 5 rows of the first five instruments
-    for key in data_dict.keys():
-        print(data_dict[key].head())
+    # list comprehension to see if the dataframe is empty
+    for instrument in data_dict:
+        if not data_dict[instrument].empty:
+            print(data_dict[instrument].head())
+        else:
+            print(f"{instrument} is empty")
