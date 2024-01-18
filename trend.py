@@ -1,4 +1,4 @@
-from sql_functions import get_data_dict_sql_no_carry
+import sql_functions as sql
 
 from fx_functions import create_fx_series_given_adjusted_prices_dict
 
@@ -72,7 +72,7 @@ def calc_idm(instrument_list: list) -> float:
 
 def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> list:
 
-    adjusted_prices_dict, current_prices_dict = sql.get_data_dict_sql_no_carry(instr_list)
+    adjusted_prices_dict, current_prices_dict = sql.get_data(instr_list)
 
     fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
 
@@ -81,7 +81,10 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
 
     instrument_weights = weights
 
-    cost_per_contract_dict = dict(ES=0.875, CL=0.875)
+    # NEED TO FIX!!! HARDCODED COSTS
+    # PIN ALL COSTS to 0.875 for all instruments in list
+    for instrument in instr_list:
+        cost_per_contract_dict = dict(instrument=0.875)
 
     std_dev_dict = calculate_variable_standard_deviation_for_risk_targeting_from_dict(
         adjusted_prices=adjusted_prices_dict, current_prices=current_prices_dict
@@ -128,18 +131,23 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
     return [buffered_position_dict, position_contracts_dict]
 
 # List of all instruments in the portfolio
-INSTRUMENT_LIST = ['ES']
+def main():
 
-even_weights = 1 / len(INSTRUMENT_LIST)
+    INSTRUMENT_LIST = ['CL']
 
-weights = dict(ES=even_weights, CL =even_weights)
-# dict of equal weight for each instrument in the list
-weights = {instrument: even_weights for instrument in INSTRUMENT_LIST}
-multipliers = getMultiplierDict()
-risk_target_tau = 0.2
+    even_weights = 1 / len(INSTRUMENT_LIST)
 
-capital: int = 100000
+    
+    # dict of equal weight for each instrument in the list
+    weights = {}
+    for instrument in INSTRUMENT_LIST:
+        weights = dict(instrument=even_weights)
 
-perc, fc = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
+    multipliers = getMultiplierDict()
+    risk_target_tau = 0.2
 
-forecast = pd.DataFrame.from_dict(fc)
+    capital: int = 100000
+
+    buffered_pos, pos = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
+
+    print(pos['CL'].tail())
