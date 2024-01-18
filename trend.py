@@ -152,7 +152,7 @@ def main():
 
     buffered_pos, pos = trend_forecast(all_instruments, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
-    for code in pos.keys():
+    for code in sorted(pos.keys()):
         print(code)
         print(pos[code].tail())
     print(len(pos))
