@@ -5,7 +5,7 @@ def getMultiplierDict():
     df = pd.read_csv("Symbols.csv")
     df.set_index('Code',inplace=True)
     # Convert the dataframe to a dictionary
-    m_series = df["Point Value"].astype(int)
+    m_series = df["Point Value"].astype(float)
 
     multiplierDict = m_series.to_dict()
     # Return the dictionary
