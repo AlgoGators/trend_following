@@ -49,7 +49,7 @@ def get_data(instrument_list: list):
 
     # Convert date column to datetime
     for table_name in table_names:
-        dataframes[table_name]['Date'] = pd.to_datetime(dataframes[table_name]['Date'], format=mixed)
+        dataframes[table_name]['Date'] = pd.to_datetime(dataframes[table_name]['Date'])
 
     # Set index to date column
     for table_name in table_names:
