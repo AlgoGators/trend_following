@@ -29,12 +29,14 @@ def get_data(instrument_list: list):
     # Dictionary to store each table's DataFrame
     dataframes = {}
 
+    usable_list = []
     # Remove instrument from list table_names if it is not in instrument_list
     for table_name in table_names:
         # remove _Data from table name temporarily
         name = table_name[:-5]
-        if name not in instrument_list:
-          table_names.remove(table_name)
+        if name in instrument_list:
+            usable_list.append(name)
+            
 
     # Remove sysdiagrams from table_names
     table_names.remove('sysdiagrams')
@@ -44,7 +46,7 @@ def get_data(instrument_list: list):
         table_names[i] = table_names[i][:-5]
 
     # Print the tables that will be pulled
-    print(sorted(table_names))
+    print(sorted(usable_list))
 
     # Loop through all table names, pulling data from each one
     for table_name in table_names:
