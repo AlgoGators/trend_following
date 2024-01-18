@@ -134,13 +134,15 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
 def main():
 
     instruments = ['CL', 'ES', 'GC', 'HG', 'HO', 'NG', 'RB', 'SI']
+    symbols = pd.read_csv('Symbols.csv')
+    all_instruments = symbols['Code'].to_list()
 
-    even_weights = 1 / len(instruments)
+    even_weights = 1 / len(all_instruments)
 
     
     # dict of equal weight for each instrument in the list
     weights = {}
-    for code in instruments:
+    for code in all_instruments:
         weights[code] = even_weights
 
     multipliers = getMultiplierDict()
@@ -148,9 +150,10 @@ def main():
 
     capital = 100000
 
-    buffered_pos, pos = trend_forecast(instruments, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
+    buffered_pos, pos = trend_forecast(all_instruments, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
     print(pos['ES'].tail())
+    print(len(pos))
 
 if __name__ == '__main__':
     main()
