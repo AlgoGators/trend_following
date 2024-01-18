@@ -133,22 +133,22 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
 # List of all instruments in the portfolio
 def main():
 
-    INSTRUMENT_LIST = ['CL', 'ES', 'GC', 'HG', 'HO', 'NG', 'RB', 'SI']
+    instruments = ['CL', 'ES', 'GC', 'HG', 'HO', 'NG', 'RB', 'SI']
 
-    even_weights = 1 / len(INSTRUMENT_LIST)
+    even_weights = 1 / len(instruments)
 
     
     # dict of equal weight for each instrument in the list
     weights = {}
-    for instrument in INSTRUMENT_LIST:
-        weights = dict(instrument=even_weights)
+    for code in instruments:
+        weights[code] = even_weights
 
     multipliers = getMultiplierDict()
     risk_target_tau = 0.2
 
     capital = 100000
 
-    buffered_pos, pos = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
+    buffered_pos, pos = trend_forecast(instruments, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
     print(pos['ES'].tail())
 
