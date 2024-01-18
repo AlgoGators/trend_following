@@ -148,11 +148,13 @@ def main():
     multipliers = getMultiplierDict()
     risk_target_tau = 0.2
 
-    capital = 100000
+    capital = 400000
 
     buffered_pos, pos = trend_forecast(all_instruments, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
-    print(pos['ES'].tail())
+    for code in pos.keys():
+        print(code)
+        print(pos[code].tail())
     print(len(pos))
 
 if __name__ == '__main__':
