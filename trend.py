@@ -118,22 +118,22 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
         average_position_contracts_dict=average_position_contracts_dict,
     )
 
-    perc_return_dict = calculate_perc_returns_for_dict_with_costs(
-        position_contracts_dict=buffered_position_dict,
-        fx_series=fx_series_dict,
-        multipliers=multipliers,
-        capital=capital,
-        adjusted_prices=adjusted_prices_dict,
-        cost_per_contract_dict=cost_per_contract_dict,
-        std_dev_dict=std_dev_dict,
-    )
+    # perc_return_dict = calculate_perc_returns_for_dict_with_costs(
+    #     position_contracts_dict=buffered_position_dict,
+    #     fx_series=fx_series_dict,
+    #     multipliers=multipliers,
+    #     capital=capital,
+    #     adjusted_prices=adjusted_prices_dict,
+    #     cost_per_contract_dict=cost_per_contract_dict,
+    #     std_dev_dict=std_dev_dict,
+    # )
 
     return [buffered_position_dict, position_contracts_dict]
 
 # List of all instruments in the portfolio
 def main():
 
-    INSTRUMENT_LIST = ['CL']
+    INSTRUMENT_LIST = ['CL', 'ES', 'GC', 'HG', 'HO', 'NG', 'RB', 'SI']
 
     even_weights = 1 / len(INSTRUMENT_LIST)
 
@@ -146,8 +146,11 @@ def main():
     multipliers = getMultiplierDict()
     risk_target_tau = 0.2
 
-    capital: int = 100000
+    capital = 100000
 
     buffered_pos, pos = trend_forecast(INSTRUMENT_LIST, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
-    print(pos['CL'].tail())
+    print(pos['ES'].tail())
+
+if __name__ == '__main__':
+    main()

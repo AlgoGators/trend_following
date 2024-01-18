@@ -19,8 +19,12 @@ def get_data(instrument_list: list):
     engine = create_engine("mssql+pyodbc:///?odbc_connect=%s" % params)
 
     # Retrieve a list of all table names in the database - do not change
-    table_names_query = "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_catalog='" + database + "'"
-    table_names = pd.read_sql(table_names_query, engine)['table_name'].tolist()
+    try:
+        table_names_query = "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_catalog='" + database + "'"
+        table_names = pd.read_sql(table_names_query, engine)['table_name'].tolist()
+    except:
+        print("Error: Unable to retrieve table names from database.")
+        return
 
     # Dictionary to store each table's DataFrame
     dataframes = {}
