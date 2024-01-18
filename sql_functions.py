@@ -49,27 +49,27 @@ def get_data(instrument_list: list):
     print(sorted(usable_list))
 
     # Loop through all table names, pulling data from each one
-    for table_name in table_names:
-        table_query = f"SELECT * FROM [{table_name}_Data]"
-        dataframes[table_name] = pd.read_sql(table_query, engine)
+    for name in usable_list:
+        table_query = f"SELECT * FROM [{name}_Data]"
+        dataframes[name] = pd.read_sql(table_query, engine)
 
     # Convert date column to datetime
-    for table_name in table_names:
-        dataframes[table_name]['Date'] = pd.to_datetime(dataframes[table_name]['Date'])
+    for name in usable_list:
+        dataframes[name]['Date'] = pd.to_datetime(dataframes[name]['Date'])
 
     # Set index to date column
-    for table_name in table_names:
-        dataframes[table_name].set_index('Date', inplace=True)
-        assert dataframes[table_name].index.name == 'Date'
+    for name in usable_list:
+        dataframes[name].set_index('Date', inplace=True)
+        assert dataframes[name].index.name == 'Date'
 
     # Get all adjusted close prices in each dataframe
     adjusted_prices = {}
-    for table_name in table_names:
-        adjusted_prices[table_name] = dataframes[table_name]['Close']
+    for name in usable_list:
+        adjusted_prices[name] = dataframes[name]['Close']
 
     # Get all unadjusted close prices in each dataframe
     current_prices = {}
-    for table_name in table_names:
+    for table_name in usable_list:
         current_prices[table_name] = dataframes[table_name]['Unadj_Close']
     
     return adjusted_prices, current_prices
@@ -77,7 +77,8 @@ def get_data(instrument_list: list):
 def main():
     instrument_list = ['CL', 'ES', 'GC', 'HG', 'HO', 'NG', 'RB', 'SI']
     adjusted_prices, current_prices = get_data(instrument_list)
-    print(adjusted_prices['CL'].tail())
+    for instrument in instrument_list:
+        print(adjusted_prices[instrument].tail())
 
 if __name__ == '__main__':
     main()
