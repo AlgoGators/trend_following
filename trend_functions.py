@@ -1,7 +1,10 @@
 import numpy as np
 import pandas as pd
 
-from risk_functions import standardDeviation
+try:
+    from .risk_functions import standardDeviation
+except ImportError:
+    from risk_functions import standardDeviation
 
 # Position Sizing from Trend
 def calculate_position_dict_with_multiple_trend_forecast_applied(

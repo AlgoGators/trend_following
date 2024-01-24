@@ -1,14 +1,21 @@
-import sql_functions as sql
-
-from fx_functions import create_fx_series_given_adjusted_prices_dict
-
-from risk_functions import calculate_variable_standard_deviation_for_risk_targeting_from_dict
-from risk_functions import calculate_position_series_given_variable_risk_for_dict
-
-from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
-
 import pandas as pd
-from getMultiplierDict import getMultiplierDict
+
+try:
+    from . import sql_functions as sql
+    from .fx_functions import create_fx_series_given_adjusted_prices_dict
+    from .risk_functions import calculate_variable_standard_deviation_for_risk_targeting_from_dict
+    from .risk_functions import calculate_position_series_given_variable_risk_for_dict
+    from .trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
+    from .getMultiplierDict import getMultiplierDict
+except ImportError:
+    import sql_functions as sql
+    from fx_functions import create_fx_series_given_adjusted_prices_dict
+    from risk_functions import calculate_variable_standard_deviation_for_risk_targeting_from_dict
+    from risk_functions import calculate_position_series_given_variable_risk_for_dict
+    from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
+    from getMultiplierDict import getMultiplierDict
+
+
 # NEED TO READ DATA FIRST
 
 # def get_data_dict(instr_list: list):
