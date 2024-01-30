@@ -4,8 +4,8 @@ from copy import copy
 BUSINESS_DAYS_IN_YEAR = 256
 
 def calculate_variable_standard_deviation_for_risk_targeting_from_dict(
-    adjusted_prices: dict,
-    current_prices: dict,
+    adjusted_prices: pd.DataFrame,
+    current_prices: pd.DataFrame,
     use_perc_returns: bool = True,
     annualise_stdev: bool = True,
 ) -> dict:
@@ -21,7 +21,7 @@ def calculate_variable_standard_deviation_for_risk_targeting_from_dict(
                     annualise_stdev=annualise_stdev,
                 ),
             )
-            for instrument_code in adjusted_prices.keys()
+            for instrument_code in adjusted_prices.columns.to_list()
         ]
     )
 

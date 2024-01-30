@@ -7,6 +7,7 @@ try:
     from .risk_functions import calculate_position_series_given_variable_risk_for_dict
     from .trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
     from .getMultiplierDict import getMultiplierDict
+    from .get_historical_data import *
 except ImportError:
     import sql_functions as sql
     from fx_functions import create_fx_series_given_adjusted_prices_dict
@@ -14,34 +15,7 @@ except ImportError:
     from risk_functions import calculate_position_series_given_variable_risk_for_dict
     from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
     from getMultiplierDict import getMultiplierDict
-
-
-# NEED TO READ DATA FIRST
-
-# def get_data_dict(instr_list: list):
-#
-#     all_data = dict(
-#         [
-#             (instrument_code, pd_readcsv(f"data/_{instrument_code}_Data.csv"  , date_format="%m/%d/%Y", date_index_name='Date'))
-#             for instrument_code in instr_list
-#         ]
-#     )
-#
-#     adjusted_prices = dict(
-#         [
-#             (instrument_code, data_for_instrument.Close)
-#             for instrument_code, data_for_instrument in all_data.items()
-#         ]
-#     )
-#
-#     current_prices = dict(
-#         [
-#             (instrument_code, data_for_instrument.Unadj_Close)
-#             for instrument_code, data_for_instrument in all_data.items()
-#         ]
-#     )
-#
-#     return adjusted_prices, current_prices
+    from get_historical_data import *
 
 def calc_idm(instrument_list: list) -> float:
 
@@ -77,15 +51,10 @@ def calc_idm(instrument_list: list) -> float:
     raise ValueError("Instrument Diversity Multiplier not found")
           
 
-def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> list:
+def trend_forecast(instr_list: list, collective_adj_prices: pd.DataFrame, collective_unadj_prices: pd.DataFrame, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> list:
 
-    adjusted_prices_dict, current_prices_dict = sql.get_data(instr_list)
-
-    fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
-
-
+    fx_series_dict = create_fx_series_given_adjusted_prices_dict(collective_adj_prices)
     idm = calc_idm(instr_list)
-
     instrument_weights = weights
 
     # NEED TO FIX!!! HARDCODED COSTS
@@ -94,7 +63,7 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
         cost_per_contract_dict = dict(instrument=0.875)
 
     std_dev_dict = calculate_variable_standard_deviation_for_risk_targeting_from_dict(
-        adjusted_prices=adjusted_prices_dict, current_prices=current_prices_dict
+        adjusted_prices=collective_adj_prices, current_prices=collective_unadj_prices
     )
 
     average_position_contracts_dict = (
@@ -113,7 +82,7 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
     ## In reality we would need to check costs and turnover
     position_contracts_dict = (
         calculate_position_dict_with_multiple_trend_forecast_applied(
-            adjusted_prices_dict=adjusted_prices_dict,
+            adjusted_prices_dict=collective_adj_prices,
             average_position_contracts_dict=average_position_contracts_dict,
             std_dev_dict=std_dev_dict,
             fast_spans=fast_spans,
@@ -144,7 +113,9 @@ def main():
     symbols = pd.read_csv('Symbols.csv')
     all_instruments = symbols['Code'].to_list()
 
-    even_weights = 1 / len(all_instruments)
+    even_weights = 1 / len(instruments)
+
+    adj_df, unadj_df, _ = Prices.get_all_historical_prices(instruments)
 
     
     # dict of equal weight for each instrument in the list
@@ -157,7 +128,9 @@ def main():
 
     capital = 400000
 
-    buffered_pos, pos = trend_forecast(all_instruments, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
+
+
+    buffered_pos, pos = trend_forecast(all_instruments, adj_df, unadj_df, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
     for code in sorted(pos.keys()):
         print(code)

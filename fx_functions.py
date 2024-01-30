@@ -1,6 +1,6 @@
 import pandas as pd
 
-def create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict: dict) -> dict:
+def create_fx_series_given_adjusted_prices_dict(adjusted_prices_df: pd.DataFrame) -> dict:
     fx_series_dict = dict(
         [
             (
@@ -9,27 +9,23 @@ def create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict: dict) -> d
                     instrument_code, adjusted_prices
                 ),
             )
-            for instrument_code, adjusted_prices in adjusted_prices_dict.items()
+            for instrument_code, adjusted_prices in adjusted_prices_df.items()
         ]
     )
     return fx_series_dict
 
+# 
 def create_fx_series_given_adjusted_prices(
     instrument_code: str, adjusted_prices: pd.Series
 ) -> pd.Series:
-
-    currency_for_instrument = fx_dict.get(instrument_code, "usd")
-    if currency_for_instrument == "usd":
-        return pd.Series(1, index=adjusted_prices.index)  ## FX rate, 1 for USD / USD
-
-    fx_prices = get_fx_prices(currency_for_instrument)
-    fx_prices_aligned = fx_prices.reindex(adjusted_prices.index).ffill()
-
-    return fx_prices_aligned
+    # Everything is listed in USD, so we need to create a series of 1s
+    # NEED TO REDO FOR FORIEGN CURRENCIES
+    return pd.Series(1, index=adjusted_prices.index)  ## FX rate, 1 for USD / USD
 
 fx_dict = dict(eurostx="eur")
 
 def get_fx_prices(currency: str) -> pd.Series:
+    # ! Deprecated pd_readcsv
     prices_as_df = pd_readcsv("%s_fx.csv" % currency)
     return prices_as_df.squeeze()
 
