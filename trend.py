@@ -77,11 +77,12 @@ def calc_idm(instrument_list: list) -> float:
     raise ValueError("Instrument Diversity Multiplier not found")
           
 
-def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> list:
+def trend_forecast(instr_list: list, collective_adj_prices: pd.DataFrame, collective_unadj_prices: pd.DataFrame, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> list:
 
-    adjusted_prices_dict, current_prices_dict = sql.get_data(instr_list)
 
-    fx_series_dict = create_fx_series_given_adjusted_prices_dict(adjusted_prices_dict)
+    # No longer get data from sql in this function
+
+    fx_series_dict = create_fx_series_given_adjusted_prices_dict(collective_adj_prices)
 
 
     idm = calc_idm(instr_list)
@@ -94,7 +95,7 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
         cost_per_contract_dict = dict(instrument=0.875)
 
     std_dev_dict = calculate_variable_standard_deviation_for_risk_targeting_from_dict(
-        adjusted_prices=adjusted_prices_dict, current_prices=current_prices_dict
+        adjusted_prices=collective_adj_prices, current_prices=collective_unadj_prices
     )
 
     average_position_contracts_dict = (
@@ -113,7 +114,7 @@ def trend_forecast(instr_list: list, weights: dict, capital: int, risk_target_ta
     ## In reality we would need to check costs and turnover
     position_contracts_dict = (
         calculate_position_dict_with_multiple_trend_forecast_applied(
-            adjusted_prices_dict=adjusted_prices_dict,
+            adjusted_prices_dict=collective_adj_prices,
             average_position_contracts_dict=average_position_contracts_dict,
             std_dev_dict=std_dev_dict,
             fast_spans=fast_spans,
