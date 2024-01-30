@@ -7,6 +7,7 @@ try:
     from .risk_functions import calculate_position_series_given_variable_risk_for_dict
     from .trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
     from .getMultiplierDict import getMultiplierDict
+    from .get_historical_data import *
 except ImportError:
     import sql_functions as sql
     from fx_functions import create_fx_series_given_adjusted_prices_dict
@@ -14,6 +15,7 @@ except ImportError:
     from risk_functions import calculate_position_series_given_variable_risk_for_dict
     from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
     from getMultiplierDict import getMultiplierDict
+    from get_historical_data import *
 
 def calc_idm(instrument_list: list) -> float:
 
@@ -51,14 +53,8 @@ def calc_idm(instrument_list: list) -> float:
 
 def trend_forecast(instr_list: list, collective_adj_prices: pd.DataFrame, collective_unadj_prices: pd.DataFrame, weights: dict, capital: int, risk_target_tau: float, multipliers: dict, fast_spans: list) -> list:
 
-
-    # No longer get data from sql in this function
-
     fx_series_dict = create_fx_series_given_adjusted_prices_dict(collective_adj_prices)
-
-
     idm = calc_idm(instr_list)
-
     instrument_weights = weights
 
     # NEED TO FIX!!! HARDCODED COSTS
@@ -117,7 +113,9 @@ def main():
     symbols = pd.read_csv('Symbols.csv')
     all_instruments = symbols['Code'].to_list()
 
-    even_weights = 1 / len(all_instruments)
+    even_weights = 1 / len(instruments)
+
+    adj_df, unadj_df, _ = Prices.get_all_historical_prices(instruments)
 
     
     # dict of equal weight for each instrument in the list
@@ -130,7 +128,9 @@ def main():
 
     capital = 400000
 
-    buffered_pos, pos = trend_forecast(all_instruments, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
+
+
+    buffered_pos, pos = trend_forecast(all_instruments, adj_df, unadj_df, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
     for code in sorted(pos.keys()):
         print(code)

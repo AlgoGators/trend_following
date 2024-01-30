@@ -4,3 +4,4 @@ __pycache__
 multipliers.numbers
 out.csv
 data
+.env
