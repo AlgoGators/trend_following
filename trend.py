@@ -15,34 +15,6 @@ except ImportError:
     from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
     from getMultiplierDict import getMultiplierDict
 
-
-# NEED TO READ DATA FIRST
-
-# def get_data_dict(instr_list: list):
-#
-#     all_data = dict(
-#         [
-#             (instrument_code, pd_readcsv(f"data/_{instrument_code}_Data.csv"  , date_format="%m/%d/%Y", date_index_name='Date'))
-#             for instrument_code in instr_list
-#         ]
-#     )
-#
-#     adjusted_prices = dict(
-#         [
-#             (instrument_code, data_for_instrument.Close)
-#             for instrument_code, data_for_instrument in all_data.items()
-#         ]
-#     )
-#
-#     current_prices = dict(
-#         [
-#             (instrument_code, data_for_instrument.Unadj_Close)
-#             for instrument_code, data_for_instrument in all_data.items()
-#         ]
-#     )
-#
-#     return adjusted_prices, current_prices
-
 def calc_idm(instrument_list: list) -> float:
 
     # if the lenght of the instrument list lands in a certain bracket, return a certain value
