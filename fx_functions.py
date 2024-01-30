@@ -9,7 +9,7 @@ def create_fx_series_given_adjusted_prices_dict(adjusted_prices_df: pd.DataFrame
                     instrument_code, adjusted_prices
                 ),
             )
-            for instrument_code, adjusted_prices in adjusted_prices_df.columns.to_list()
+            for instrument_code, adjusted_prices in adjusted_prices_df.items()
         ]
     )
     return fx_series_dict
