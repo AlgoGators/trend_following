@@ -5,7 +5,7 @@ try:
     from .fx_functions import create_fx_series_given_adjusted_prices_dict
     from .risk_functions import calculate_variable_standard_deviation_for_risk_targeting_from_dict
     from .risk_functions import calculate_position_series_given_variable_risk_for_dict
-    from .trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
+    from .trend_functions import calculate_position_df_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
     from .getMultiplierDict import getMultiplierDict
     from .get_historical_data import *
 except ImportError:
@@ -13,7 +13,7 @@ except ImportError:
     from fx_functions import create_fx_series_given_adjusted_prices_dict
     from risk_functions import calculate_variable_standard_deviation_for_risk_targeting_from_dict
     from risk_functions import calculate_position_series_given_variable_risk_for_dict
-    from trend_functions import calculate_position_dict_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
+    from trend_functions import calculate_position_df_with_multiple_trend_forecast_applied, apply_buffering_to_position_dict, calculate_perc_returns_for_dict_with_costs
     from getMultiplierDict import getMultiplierDict
     from get_historical_data import *
 
@@ -81,9 +81,9 @@ def trend_forecast(instr_list: list, collective_adj_prices: pd.DataFrame, collec
     ## We use three arbitrary slow spans here for both instruments
     ## In reality we would need to check costs and turnover
     position_contracts_dict = (
-        calculate_position_dict_with_multiple_trend_forecast_applied(
-            adjusted_prices_dict=collective_adj_prices,
-            average_position_contracts_dict=average_position_contracts_dict,
+        calculate_position_df_with_multiple_trend_forecast_applied(
+            adjusted_prices_df=collective_adj_prices,
+            average_position_contracts_df=pd.DataFrame(average_position_contracts_dict),
             std_dev_dict=std_dev_dict,
             fast_spans=fast_spans,
         )
@@ -130,12 +130,12 @@ def main():
 
 
 
-    buffered_pos, pos = trend_forecast(all_instruments, adj_df, unadj_df, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
+    _, pos_df = trend_forecast(all_instruments, adj_df, unadj_df, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
-    for code in sorted(pos.keys()):
+
+    for code, series in pos_df.items():
         print(code)
-        print(pos[code].tail())
-    print(len(pos))
+        print(series.tail())
 
 if __name__ == '__main__':
     main()
