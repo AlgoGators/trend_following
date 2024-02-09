@@ -15,15 +15,16 @@ class SQLPull:
             adj_column: str = 'Close', 
             interest_column : str = 'Open Interest'):
         # get all tables from database
-        driver = "ODBC Driver 18 for SQL Server"
-        server = os.getenv("SERVER")
-        username = os.getenv("USERNAME")
-        password = os.getenv("PASSWORD")
-        database = os.getenv("PRICE_DATABASE")
+        postgres_driver = 'postgresql+psycopg2'
+        postgres_user = os.getenv("USER")
+        postgres_pass = os.getenv("PASSWORD")
+        postgres_host = os.getenv("HOST")
+        postgres_port = '5432'
+        postgres_db = 'trenddata'
 
         # Connection string for SQL Server Authentication - do not change
-        params = urllib.parse.quote_plus(fr'DRIVER={driver};SERVER={server};DATABASE={database};UID={username};PWD={password}')
-        engine = create_engine("mssql+pyodbc:///?odbc_connect=%s" % params)
+        postgres_url = f"{postgres_driver}://{postgres_user}:{postgres_pass}@{postgres_host}:{postgres_port}/{postgres_db}"
+        engine = create_engine(postgres_url)
         logging.info("Connected to SQL Server.")
 
         # Retrieve a list of all table names in the database - do not change
@@ -40,6 +41,7 @@ class SQLPull:
         # Dictionary of dataframes
         instrument_dataframes = {}
         for instrument in instrument_list:
+            logging.info(f'Downloading: {instrument}')
             table_name = instrument + price_suffix
 
             if (table_name not in table_names):
@@ -192,5 +194,5 @@ def get_most_recent_open_interest(open_interest_df : pd.DataFrame) -> dict:
     return most_recent_open_interest
 
 if __name__ == '__main__':
-    df = Prices.get_all_historical_prices(['6A', 'ES', 'ZF'])
+    df1, df2, df3 = Prices.get_all_historical_prices(['6A', 'ES', 'ZF'])
     carry_dct = SQLPull.get_carry_data(['6A', 'ES', 'ZF'])
