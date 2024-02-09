@@ -109,7 +109,7 @@ def trend_forecast(instr_list: list, collective_adj_prices: pd.DataFrame, collec
 # List of all instruments in the portfolio
 def main():
 
-    instruments = ['CL', 'ES', 'GC', 'HG', 'HO', 'NG', 'RB', 'SI']
+    instruments = ['YM', 'GC', 'HG', 'RB', 'SI']
     symbols = pd.read_csv('Symbols.csv')
     all_instruments = symbols['Code'].to_list()
 

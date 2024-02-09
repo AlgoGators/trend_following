@@ -3,6 +3,8 @@ from sqlalchemy import create_engine
 import urllib
 import os
 import logging
+from dotenv import load_dotenv
+from pathlib import Path
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
@@ -10,18 +12,19 @@ logging.basicConfig(level=logging.INFO)
 class SQLPull:
     def get_price_data(
             instrument_list: list,
-            price_suffix : str = '_Data',
+            price_suffix : str = '_data',
             unadj_column: str = 'Unadj_Close', 
             adj_column: str = 'Close', 
             interest_column : str = 'Open Interest'):
         # get all tables from database
+        load_dotenv()
         postgres_driver = 'postgresql+psycopg2'
-        postgres_user = os.getenv("USER")
+        postgres_user = 'datamanager'
         postgres_pass = os.getenv("PASSWORD")
         postgres_host = os.getenv("HOST")
         postgres_port = '5432'
         postgres_db = 'trenddata'
-
+        print(postgres_user, postgres_pass, postgres_host, postgres_port, postgres_db)
         # Connection string for SQL Server Authentication - do not change
         postgres_url = f"{postgres_driver}://{postgres_user}:{postgres_pass}@{postgres_host}:{postgres_port}/{postgres_db}"
         engine = create_engine(postgres_url)
@@ -29,8 +32,10 @@ class SQLPull:
 
         # Retrieve a list of all table names in the database - do not change
         try:
-            table_names_query = "SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE' AND table_catalog='" + database + "'"
-            table_names = pd.read_sql(table_names_query, engine)['table_name'].tolist()
+            table_names_query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type='BASE TABLE';"
+            print('1')
+            table_df = pd.read_sql(table_names_query, engine)
+            table_names = table_df['table_name'].tolist()
         except:
             # Raise the error if the table isn't found; considering it returned from the function anyway.
             raise KeyError("Unable to retrieve table names from Price database.")
@@ -47,7 +52,7 @@ class SQLPull:
             if (table_name not in table_names):
                 raise KeyError(f"Error: {instrument} is not in the database.")
             
-            table_query = f"SELECT * FROM [{table_name}]"
+            table_query = f"SELECT * FROM \"{table_name}\""
             instrument_dataframes[instrument] = pd.read_sql(table_query, engine)
 
         logging.info("Retrieved instrument dataframes from SQL Server.")
