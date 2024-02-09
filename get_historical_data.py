@@ -24,7 +24,6 @@ class SQLPull:
         postgres_host = os.getenv("HOST")
         postgres_port = '5432'
         postgres_db = 'trenddata'
-        print(postgres_user, postgres_pass, postgres_host, postgres_port, postgres_db)
         # Connection string for SQL Server Authentication - do not change
         postgres_url = f"{postgres_driver}://{postgres_user}:{postgres_pass}@{postgres_host}:{postgres_port}/{postgres_db}"
         engine = create_engine(postgres_url)
@@ -33,7 +32,6 @@ class SQLPull:
         # Retrieve a list of all table names in the database - do not change
         try:
             table_names_query = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type='BASE TABLE';"
-            print('1')
             table_df = pd.read_sql(table_names_query, engine)
             table_names = table_df['table_name'].tolist()
         except:
