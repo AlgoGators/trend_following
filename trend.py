@@ -108,7 +108,6 @@ def trend_forecast(instr_list: list, collective_adj_prices: pd.DataFrame, collec
 
 # List of all instruments in the portfolio
 def main():
-
     instruments = ['YM', 'GC', 'HG', 'RB', 'SI']
     symbols = pd.read_csv('Symbols.csv')
     all_instruments = symbols['Code'].to_list()
@@ -116,7 +115,6 @@ def main():
     even_weights = 1 / len(instruments)
 
     adj_df, unadj_df, _ = Prices.get_all_historical_prices(instruments)
-
     
     # dict of equal weight for each instrument in the list
     weights = {}
@@ -125,10 +123,7 @@ def main():
 
     multipliers = getMultiplierDict()
     risk_target_tau = 0.2
-
     capital = 400000
-
-
 
     buffered_pos, pos = trend_forecast(all_instruments, adj_df, unadj_df, weights, capital, risk_target_tau, multipliers, [16, 32, 64])
 
@@ -136,6 +131,5 @@ def main():
         print(code)
         print(pos[code].tail())
     print(len(pos))
-
 if __name__ == '__main__':
     main()
