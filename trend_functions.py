@@ -45,6 +45,7 @@ def calculate_position_with_multiple_trend_forecast_applied(
         fast_spans=fast_spans,
     )
 
+    # ! REVIEW CARVER'S THEORY
     return forecast * average_position / 10
 
 def calculate_combined_ewmac_forecast(
